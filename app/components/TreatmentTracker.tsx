@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Activity, Heart, Pill, TrendingUp } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const TreatmentTracker: React.FC = () => {
   const { treatmentTrackers, patients, t } = useApp();

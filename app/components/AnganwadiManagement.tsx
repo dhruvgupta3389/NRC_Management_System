@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Building, Users, Activity, MapPin } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const AnganwadiManagement: React.FC = () => {
   const { anganwadis, workers } = useApp();

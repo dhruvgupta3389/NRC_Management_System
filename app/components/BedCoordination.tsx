@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Activity, Plus, CheckCircle, Clock, User, Calendar } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const BedCoordination: React.FC = () => {
   const { beds, patients, t } = useApp();

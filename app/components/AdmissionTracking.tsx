@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { UserCheck, Clock, CheckCircle, User, Calendar, FileText } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const AdmissionTracking: React.FC = () => {
   const { beds, patients, t } = useApp();

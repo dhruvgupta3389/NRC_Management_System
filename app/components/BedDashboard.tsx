@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Bed, BarChart3, TrendingUp, Users } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const BedDashboard: React.FC = () => {
   const { beds, patients } = useApp();

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BarChart3, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const BedDemandPrediction: React.FC = () => {
   const { beds, patients } = useApp();
