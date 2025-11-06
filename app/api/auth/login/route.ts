@@ -9,11 +9,16 @@ export async function POST(request: NextRequest) {
 
     console.log('🔐 Login attempt for:', { username, employee_id });
 
-    const user = csvManager.findOne('users.csv', {
+    const searchCriteria: any = {
       username: username,
-      employee_id: employee_id,
       is_active: 'true'
-    });
+    };
+
+    if (employee_id) {
+      searchCriteria.employee_id = employee_id;
+    }
+
+    const user = csvManager.findOne('users.csv', searchCriteria);
 
     if (!user) {
       console.log('❌ User not found in CSV database');
