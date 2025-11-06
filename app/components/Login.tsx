@@ -202,15 +202,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Employee ID • कर्मचारी आईडी
+                  Employee ID • कर्मचारी आईडी <span className="text-gray-400 text-xs">(optional)</span>
                 </label>
                 <input
                   type="text"
-                  required
                   value={credentials.employeeId}
                   onChange={(e) => setCredentials({...credentials, employeeId: e.target.value})}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Enter your employee ID"
+                  placeholder="Enter your employee ID (if known)"
                 />
               </div>
 

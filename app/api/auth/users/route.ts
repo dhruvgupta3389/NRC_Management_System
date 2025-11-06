@@ -35,15 +35,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { employeeId, username, password, name, role, contactNumber, email, createdBy } = body;
+    let { employeeId, username, password, name, role, contactNumber, email, createdBy } = body;
 
     console.log('📝 Creating new user in CSV:', JSON.stringify(body, null, 2));
 
-    if (!employeeId || !username || !password || !name || !role) {
+    if (!username || !password || !name || !role) {
       return NextResponse.json(
         { errors: [{ message: 'Missing required fields' }] },
         { status: 400 }
       );
+    }
+
+    if (!employeeId) {
+      const timestamp = Date.now().toString().slice(-6);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      employeeId = `EMP${timestamp}${random}`.substring(0, 12);
+      console.log('🔄 Generated Employee ID:', employeeId);
     }
 
     const existingUser = csvManager.findOne('users.csv', { employee_id: employeeId });
@@ -86,7 +93,7 @@ export async function POST(request: NextRequest) {
     if (success) {
       console.log('✅ User successfully created in CSV database with ID:', userId);
       return NextResponse.json(
-        { message: 'User created successfully', id: userId },
+        { message: 'User created successfully', id: userId, employee_id: employeeId },
         { status: 201 }
       );
     } else {
