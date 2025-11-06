@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, Plus, Edit, Trash2, Eye, EyeOff, Key, UserCheck, AlertTriangle, CheckCircle, LogOut, Clock } from 'lucide-react';
+import { Shield, Users, Plus, Edit, Trash2, Eye, EyeOff, Key, UserCheck, AlertTriangle, CheckCircle, LogOut, Clock, BarChart3, Activity, Server, TrendingUp, Home, Settings } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 interface User {
@@ -17,7 +17,8 @@ interface User {
 }
 
 const AdminPanel: React.FC = () => {
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, patients, beds } = useApp();
+  const [activeTab, setActiveTab] = useState<'overview' | 'users'>('overview');
   const [users, setUsers] = useState<User[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
