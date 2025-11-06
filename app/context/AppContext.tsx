@@ -188,7 +188,7 @@ const translations = {
     'common.name': 'नाम',
     'common.age': 'आयु',
     'common.contact': 'संपर्क',
-    'common.address': 'पत���',
+    'common.address': 'पता',
     'common.weight': 'वजन',
     'common.height': 'ऊंचाई',
     'common.status': 'स्थिति',
@@ -407,6 +407,62 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch (error) {
       console.error('❌ Failed to add notification:', error);
     }
+  };
+
+  const addVisitTicket = async (ticket: any) => {
+    setVisitTickets([...visitTickets, { ...ticket, id: `ticket-${Date.now()}` }]);
+  };
+
+  const updateVisitTicket = async (id: string, updates: any) => {
+    setVisitTickets(visitTickets.map(t => t.id === id ? { ...t, ...updates } : t));
+  };
+
+  const addMissedVisitTicket = async (ticket: any) => {
+    setMissedVisitTickets([...missedVisitTickets, { ...ticket, id: `missed-${Date.now()}` }]);
+  };
+
+  const updateMissedVisitTicket = async (id: string, updates: any) => {
+    setMissedVisitTickets(missedVisitTickets.map(t => t.id === id ? { ...t, ...updates } : t));
+  };
+
+  const addBedRequest = async (request: any) => {
+    setBedRequests([...bedRequests, { ...request, id: `req-${Date.now()}` }]);
+  };
+
+  const updateBedRequest = async (id: string, updates: any) => {
+    setBedRequests(bedRequests.map(r => r.id === id ? { ...r, ...updates } : r));
+  };
+
+  const addWorker = async (worker: any) => {
+    setWorkers([...workers, { ...worker, id: `worker-${Date.now()}` }]);
+  };
+
+  const addAnganwadi = async (anganwadi: any) => {
+    setAnganwadis([...anganwadis, { ...anganwadi, id: `center-${Date.now()}` }]);
+  };
+
+  const addSurvey = async (survey: any) => {
+    setSurveys([...surveys, { ...survey, id: `survey-${Date.now()}` }]);
+  };
+
+  const addMedicalRecord = async (record: any) => {
+    setMedicalRecords([...medicalRecords, { ...record, id: `record-${Date.now()}` }]);
+  };
+
+  const addVisit = async (visit: any) => {
+    setVisits([...visits, { ...visit, id: `visit-${Date.now()}` }]);
+  };
+
+  const updateVisit = async (id: string, updates: any) => {
+    setVisits(visits.map(v => v.id === id ? { ...v, ...updates } : v));
+  };
+
+  const getPatientMedicalHistory = (patientId: string) => {
+    return medicalRecords.filter(r => r.patientId === patientId);
+  };
+
+  const addTreatmentTracker = async (tracker: any) => {
+    setTreatmentTrackers([...treatmentTrackers, { ...tracker, id: `tracker-${Date.now()}` }]);
   };
 
   useEffect(() => {
