@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { FileText, Plus, Search, Calendar, User, Heart, Thermometer, Activity } from 'lucide-react';
-import { useApp, SurveyReport } from '../../context/AppContext';
+import { useApp, SurveyReport } from '../context/AppContext';
 
 const SurveyReports: React.FC = () => {
   const { surveys, patients, addSurvey, t } = useApp();

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { FileText, User, Calendar, Activity, Pill, TestTube, Heart, Thermometer, Weight, Ruler, Eye, Plus } from 'lucide-react';
-import { useApp, MedicalRecord } from '../../context/AppContext';
+import { useApp, MedicalRecord } from '../context/AppContext';
 
 const MedicalRecords: React.FC = () => {
   const { patients, medicalRecords, getPatientMedicalHistory, addMedicalRecord, t } = useApp();

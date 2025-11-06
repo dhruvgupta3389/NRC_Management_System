@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Users, Plus, Phone, MapPin, Calendar, Clock, User, Eye, CheckCircle, XCircle, Building } from 'lucide-react';
-import { useApp, Worker } from '../../context/AppContext';
+import { useApp, Worker } from '../context/AppContext';
 
 const WorkerManagement: React.FC = () => {
   const { workers, anganwadis, addWorker, t } = useApp();

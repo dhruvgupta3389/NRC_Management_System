@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Calendar, Clock, CheckCircle, XCircle, AlertTriangle, Plus, Search, Ticket } from 'lucide-react';
-import { useApp, Visit } from '../../context/AppContext';
+import { useApp, Visit } from '../context/AppContext';
 
 const VisitScheduling: React.FC = () => {
   const { visits, patients, addVisit, updateVisit, addMissedVisitTicket, t } = useApp();
