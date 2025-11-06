@@ -100,6 +100,19 @@ interface AppContextType {
   updateBed: (id: string, updates: Partial<Bed>) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
   addNotification: (notification: Omit<Notification, 'id'>) => Promise<void>;
+  addVisitTicket: (ticket: any) => Promise<void>;
+  updateVisitTicket: (id: string, updates: any) => Promise<void>;
+  addMissedVisitTicket: (ticket: any) => Promise<void>;
+  updateMissedVisitTicket: (id: string, updates: any) => Promise<void>;
+  addBedRequest: (request: any) => Promise<void>;
+  updateBedRequest: (id: string, updates: any) => Promise<void>;
+  addWorker: (worker: any) => Promise<void>;
+  addAnganwadi: (anganwadi: any) => Promise<void>;
+  addSurvey: (survey: any) => Promise<void>;
+  addMedicalRecord: (record: any) => Promise<void>;
+  addVisit: (visit: any) => Promise<void>;
+  updateVisit: (id: string, updates: any) => Promise<void>;
+  getPatientMedicalHistory: (patientId: string) => any[];
 
   loading: boolean;
   error: string | null;
@@ -175,7 +188,7 @@ const translations = {
     'common.name': 'नाम',
     'common.age': 'आयु',
     'common.contact': 'संपर्क',
-    'common.address': 'पता',
+    'common.address': 'पत���',
     'common.weight': 'वजन',
     'common.height': 'ऊंचाई',
     'common.status': 'स्थिति',
