@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Brain, TrendingUp, AlertTriangle, Calendar, User, Activity, Target, Lightbulb } from 'lucide-react';
-import { useApp, HealthPrediction } from '../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const AIHealthPrediction: React.FC = () => {
   const { aiPredictions, patients, addAIPrediction, t } = useApp();
