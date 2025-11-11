@@ -116,7 +116,7 @@ const VisitTicketing: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Missed Visit Conditions</label>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(formData.missedConditions).map(([key, value]) => (
+                {Object.entries(formData.missedConditions).map(([key, value]: [string, boolean]) => (
                   <label key={key} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
