@@ -349,7 +349,7 @@ const MedicalRecords: React.FC = () => {
             <div>
               <h4 className="text-md font-medium text-gray-900 mb-3">{t('medical.symptoms')}</h4>
               <div className="space-y-2">
-                {record.symptoms.map((symptom, index) => (
+                {record.symptoms.map((symptom: string, index: number) => (
                   <span key={index} className="inline-block px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs mr-2">
                     {symptom}
                   </span>
@@ -359,7 +359,7 @@ const MedicalRecords: React.FC = () => {
             <div>
               <h4 className="text-md font-medium text-gray-900 mb-3">{t('medical.diagnosis')}</h4>
               <div className="space-y-2">
-                {record.diagnosis.map((diag, index) => (
+                {record.diagnosis.map((diag: string, index: number) => (
                   <span key={index} className="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs mr-2">
                     {diag}
                   </span>
@@ -372,7 +372,7 @@ const MedicalRecords: React.FC = () => {
             <div>
               <h4 className="text-md font-medium text-gray-900 mb-3">{t('medical.medications')}</h4>
               <div className="space-y-2">
-                {record.medications.map((med, index) => (
+                {record.medications.map((med: any, index: number) => (
                   <div key={index} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
                     <Pill className="w-4 h-4 text-green-600" />
                     <span className="font-medium">{med.name}</span>
