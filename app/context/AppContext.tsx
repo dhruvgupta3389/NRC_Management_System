@@ -387,7 +387,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const API_BASE_URL = '/api';
 
   const t = (key: string, params?: any): string => {
-    const translation = translations[language][key as keyof typeof translations['en']] || key;
+    const translation = (translations[language] as any)[key] || key;
     if (params) {
       return translation.replace(/\{(\w+)\}/g, (match, paramKey) => params[paramKey] || match);
     }
