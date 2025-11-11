@@ -121,7 +121,7 @@ const WorkerManagement: React.FC = () => {
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Assigned Areas</h4>
                 <div className="flex flex-wrap gap-2">
-                  {worker.assignedAreas.map((area, index) => (
+                  {worker.assignedAreas.map((area: string, index: number) => (
                     <span key={index} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                       {area}
                     </span>
@@ -134,7 +134,7 @@ const WorkerManagement: React.FC = () => {
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Qualifications</h4>
                 <div className="flex flex-wrap gap-2">
-                  {worker.qualifications.map((qualification, index) => (
+                  {worker.qualifications.map((qualification: string, index: number) => (
                     <span key={index} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
                       {qualification}
                     </span>
