@@ -188,7 +188,7 @@ const AnganwadiVisitTickets: React.FC = () => {
                   disabled={!selectedAnganwadi}
                 >
                   <option value="">{t('ticket.assignedArea')}</option>
-                  {selectedAnganwadi?.coverageAreas.map(area => (
+                  {selectedAnganwadi?.coverageAreas.map((area: string) => (
                     <option key={area} value={area}>{area}</option>
                   ))}
                 </select>
