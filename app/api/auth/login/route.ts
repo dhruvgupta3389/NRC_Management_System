@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { sign, type Secret } from 'jsonwebtoken';
 import { csvManager } from '@/lib/csvManager';
 
 export async function POST(request: NextRequest) {
@@ -44,14 +44,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = jwt.sign(
+    const secret: Secret = process.env.JWT_SECRET ?? 'default-secret';
+    const token = sign(
       {
         userId: user.id,
         employeeId: user.employee_id,
         role: user.role
       },
-      process.env.JWT_SECRET || 'default-secret',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      secret,
+      { expiresIn: (process.env.JWT_EXPIRES_IN ?? '24h') as string }
     );
 
     console.log('✅ Login successful for:', user.name);
