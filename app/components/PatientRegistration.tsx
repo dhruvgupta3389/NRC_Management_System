@@ -53,10 +53,12 @@ const PatientRegistration: React.FC = () => {
       registeredBy: currentUser?.employee_id || '',
       riskScore: formData.nutritionStatus === 'severely_malnourished' ? 85 : 
                  formData.nutritionStatus === 'malnourished' ? 60 : 30,
-      nutritionalDeficiency: formData.nutritionStatus === 'severely_malnourished' ? 
-                           ['Protein', 'Iron', 'Vitamin D'] : 
-                           formData.nutritionStatus === 'malnourished' ? 
-                           ['Iron', 'Vitamin D'] : []
+      nutritionalDeficiency: formData.nutritionStatus === 'severely_malnourished' ?
+                           ['Protein', 'Iron', 'Vitamin D'] :
+                           formData.nutritionStatus === 'malnourished' ?
+                           ['Iron', 'Vitamin D'] : [],
+      admissionDate: new Date().toISOString().split('T')[0],
+      nextVisit: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
 
     addPatient(newPatient);
