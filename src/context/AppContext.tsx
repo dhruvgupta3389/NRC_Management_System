@@ -549,7 +549,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateBed,
     markNotificationRead,
     addNotification,
-    
+    addAIPrediction,
+
     // Loading states
     loading,
     error,
