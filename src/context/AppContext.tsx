@@ -214,7 +214,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [visitTickets, setVisitTickets] = useState<any[]>([]);
   const [treatmentTrackers, setTreatmentTrackers] = useState<any[]>([]);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+  const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001/api';
 
   // Translation function
   const t = (key: string, params?: any): string => {
