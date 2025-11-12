@@ -38,15 +38,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Login successful:', data.user.name);
         onLogin(data.user.role, data.user);
       } else {
         const errorData = await response.json();
-        console.log('❌ Login failed:', errorData.error);
         alert(errorData.error || 'Invalid credentials. Please try again.');
       }
     } catch (error) {
-      console.error('❌ Login error:', error);
       alert('Connection error. Please check if the server is running.');
     }
 
@@ -203,7 +200,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Employee ID • कर्मचारी आईड��
+                  Employee ID • कर्मचारी आईडी
                 </label>
                 <input
                   type="text"
