@@ -97,7 +97,7 @@ const AdmissionTracking: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Treatment Plan</h4>
               <div className="flex flex-wrap gap-2">
-                {tracker.treatmentPlan.map((treatment, index) => (
+                {tracker.treatmentPlan.map((treatment: string, index: number) => (
                   <span key={index} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                     {treatment}
                   </span>
@@ -109,7 +109,7 @@ const AdmissionTracking: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Progress Tracking</h4>
               <div className="space-y-3">
-                {tracker.dailyProgress.slice(-5).map((progress, index) => (
+                {tracker.dailyProgress.slice(-5).map((progress: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-3 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">{new Date(progress.date).toLocaleDateString()}</span>
