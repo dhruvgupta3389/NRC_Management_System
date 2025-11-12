@@ -242,7 +242,7 @@ const AdmissionTracking: React.FC = () => {
             <p className="text-gray-500">No admission/discharge records found</p>
           </div>
         ) : (
-          filteredTrackers.map(tracker => {
+          filteredTrackers.map((tracker: any) => {
             const patient = patients.find(p => p.id === tracker.patientId);
             const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
             const stayDuration = tracker.dischargeDate ? 
@@ -317,7 +317,7 @@ const AdmissionTracking: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Treatment Plan</h4>
                     <div className="flex flex-wrap gap-1">
-                      {tracker.treatmentPlan.slice(0, 2).map((treatment, index) => (
+                      {tracker.treatmentPlan.slice(0, 2).map((treatment: string, index: number) => (
                         <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
                           {treatment}
                         </span>
