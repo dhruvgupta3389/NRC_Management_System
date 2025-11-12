@@ -69,6 +69,35 @@ export interface Notification {
   date: string;
 }
 
+export interface Anganwadi {
+  id: string;
+  name: string;
+  code: string;
+  location: {
+    area: string;
+    district: string;
+    state: string;
+    pincode: string;
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+  };
+  supervisor: {
+    name: string;
+    contactNumber: string;
+    employeeId: string;
+  };
+  capacity: {
+    pregnantWomen: number;
+    children: number;
+  };
+  coverageAreas: string[];
+  facilities: string[];
+  establishedDate: string;
+  isActive: boolean;
+}
+
 // Context
 interface AppContextType {
   // Language
