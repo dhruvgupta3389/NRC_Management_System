@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { TrendingUp, User, Calendar, CheckCircle, XCircle, Clock, FileText, Activity, Heart } from 'lucide-react';
-import { useApp, TreatmentTracker } from '../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const AdmissionTracking: React.FC = () => {
   const { treatmentTrackers, patients, beds, t } = useApp();
   const [filterStatus, setFilterStatus] = useState<'all' | 'admitted' | 'discharged'>('all');
-  const [selectedTracker, setSelectedTracker] = useState<TreatmentTracker | null>(null);
+  const [selectedTracker, setSelectedTracker] = useState<any>(null);
 
   const admittedPatients = treatmentTrackers.filter(tracker => !tracker.dischargeDate);
   const dischargedPatients = treatmentTrackers.filter(tracker => tracker.dischargeDate);
