@@ -4,8 +4,6 @@ import { csvManager } from '@/lib/csvManager';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('📊 Fetching all patients from CSV database...');
-
     const patients = csvManager.readCSV('patients.csv');
 
     const transformedPatients = patients
@@ -43,12 +41,11 @@ export async function GET(request: NextRequest) {
         nextVisit: patient.next_visit_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       }));
 
-    console.log(`✅ Successfully retrieved ${transformedPatients.length} patients from CSV`);
     return NextResponse.json(transformedPatients);
   } catch (err) {
-    console.error('❌ Error fetching patients from CSV:', err);
+    console.error('❌ Error fetching patients:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to fetch patients' },
+      { error: 'Failed to fetch patients' },
       { status: 500 }
     );
   }
