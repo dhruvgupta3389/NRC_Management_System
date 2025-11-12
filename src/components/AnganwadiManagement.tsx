@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Plus, Users, Phone, Calendar, Building, CheckCircle, XCircle, Eye, Edit } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import { useApp, Anganwadi } from '../context/AppContext';
 
 const AnganwadiManagement: React.FC = () => {
   const { anganwadis, workers, t } = useApp();
