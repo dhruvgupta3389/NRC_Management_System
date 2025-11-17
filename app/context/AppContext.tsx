@@ -356,7 +356,7 @@ const translations = {
     'common.contact': 'संपर्क',
     'common.address': 'पता',
     'common.weight': 'वजन',
-    'common.height': 'ऊंच��ई',
+    'common.height': 'ऊंचाई',
     'common.status': 'स्थिति',
     'patient.child': 'बच्चा',
     'patient.pregnant': 'गर्भवती महिला'
@@ -627,11 +627,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return medicalRecords.filter(r => r.patientId === patientId);
   };
 
-  const addTreatmentTracker = async (tracker: any) => {
-    setTreatmentTrackers([...treatmentTrackers, { ...tracker, id: `tracker-${Date.now()}` }]);
+  const addTreatmentTracker = async (tracker: Omit<TreatmentTracker, 'id'>) => {
+    setTreatmentTrackers([...treatmentTrackers, { ...tracker, id: `tracker-${Date.now()}` } as TreatmentTracker]);
   };
 
-  const updateTreatmentTracker = async (id: string, updates: any) => {
+  const updateTreatmentTracker = async (id: string, updates: Partial<TreatmentTracker>) => {
     setTreatmentTrackers(treatmentTrackers.map(tracker =>
       tracker.id === id ? { ...tracker, ...updates } : tracker
     ));
