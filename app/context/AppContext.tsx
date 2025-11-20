@@ -407,9 +407,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const API_BASE_URL = '/api';
 
   const t = (key: string, params?: Record<string, string | number>): string => {
-    const translation = (translations[language] as Record<string, string>)[key] || key;
+    const translationsObj = translations[language] as Record<string, string>;
+    const translation = translationsObj[key] || key;
     if (params) {
-      return translation.replace(/\{(\w+)\}/g, (match: string, paramKey: string) => String(params[paramKey]) || match);
+      return translation.replace(/\{(\w+)\}/g, (_match: string, paramKey: string) => String(params[paramKey]) || _match);
     }
     return translation;
   };
@@ -670,7 +671,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           const elapsed = currentTime - parseInt(loginTime);
 
           if (elapsed > SESSION_DURATION) {
-            console.log('��� Session expired');
+            console.log('⏰ Session expired');
             localStorage.removeItem('currentUser');
             localStorage.removeItem('userRole');
             localStorage.removeItem('loginTime');
