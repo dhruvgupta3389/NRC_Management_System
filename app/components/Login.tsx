@@ -21,6 +21,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!credentials.username || !credentials.password) {
+      alert('Please enter both username and password');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -34,45 +40,34 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         body: JSON.stringify({
           username: credentials.username,
           password: credentials.password,
-          employee_id: credentials.employeeId
+          employee_id: credentials.employeeId || undefined
         }),
       });
 
-      const contentType = response.headers.get('content-type');
-      let data: any = null;
-
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          data = await response.json();
-        } catch (parseError) {
-          console.error('❌ Failed to parse JSON response:', parseError);
-          const text = await response.text();
-          console.error('Response text:', text);
-          alert('Server error. Please try again.');
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        const text = await response.text();
-        console.error('❌ Non-JSON response from server:', text);
-        alert('Server error. Invalid response format.');
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('❌ Login failed:', data.error);
+        alert(data?.error || 'Invalid credentials. Please try again.');
         setIsLoading(false);
         return;
       }
 
-      if (response.ok && data) {
-        console.log('✅ Login successful:', data.user.name);
-        onLogin(data.user.role, data.user);
-      } else {
-        console.log('❌ Login failed:', data?.error || 'Unknown error');
-        alert(data?.error || 'Invalid credentials. Please try again.');
+      const data = await response.json();
+
+      if (!data.user || !data.token) {
+        console.error('❌ Invalid response data');
+        alert('Server error. Please try again.');
+        setIsLoading(false);
+        return;
       }
+
+      console.log('✅ Login successful:', data.user.name);
+      onLogin(data.user.role, data.user);
     } catch (error) {
       console.error('❌ Login error:', error);
       alert('Connection error. Please check if the server is running.');
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const roleConfigs = {
