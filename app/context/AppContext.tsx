@@ -276,7 +276,7 @@ interface AppContextType {
   surveys: SurveyReport[];
   aiPredictions: Record<string, unknown>[];
   missedVisitTickets: MissedVisitTicket[];
-  visitTickets: Record<string, unknown>[];
+  visitTickets: AnganwadiVisitTicket[];
   treatmentTrackers: TreatmentTracker[];
 
   addPatient: (patient: Omit<Patient, 'id' | 'registrationNumber' | 'admissionDate'>) => Promise<void>;
@@ -284,10 +284,10 @@ interface AppContextType {
   updateBed: (id: string, updates: Partial<Bed>) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
   addNotification: (notification: Omit<Notification, 'id'>) => Promise<void>;
-  addVisitTicket: (ticket: Record<string, unknown>) => Promise<void>;
-  updateVisitTicket: (id: string, updates: Record<string, unknown>) => Promise<void>;
-  addMissedVisitTicket: (ticket: Record<string, unknown>) => Promise<void>;
-  updateMissedVisitTicket: (id: string, updates: Record<string, unknown>) => Promise<void>;
+  addVisitTicket: (ticket: Omit<AnganwadiVisitTicket, 'id'>) => Promise<void>;
+  updateVisitTicket: (id: string, updates: Partial<AnganwadiVisitTicket>) => Promise<void>;
+  addMissedVisitTicket: (ticket: Omit<MissedVisitTicket, 'id'>) => Promise<void>;
+  updateMissedVisitTicket: (id: string, updates: Partial<MissedVisitTicket>) => Promise<void>;
   addBedRequest: (request: Omit<BedRequest, 'id'>) => Promise<void>;
   updateBedRequest: (id: string, updates: Partial<BedRequest>) => Promise<void>;
   addWorker: (worker: Omit<Worker, 'id'>) => Promise<void>;
