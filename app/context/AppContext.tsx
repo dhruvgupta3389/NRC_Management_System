@@ -234,6 +234,26 @@ export interface MissedVisitTicket {
   escalationLevel: 'none' | 'anganwadi' | 'district' | 'state';
 }
 
+export interface AnganwadiVisitTicket {
+  id: string;
+  anganwadiId: string;
+  workerId: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  assignedArea: string;
+  visitType: 'routine_checkup' | 'nutrition_survey' | 'vaccination' | 'emergency' | 'follow_up';
+  targetBeneficiaries: { pregnantWomen: number; children: number };
+  status: 'scheduled' | 'in_progress' | 'completed' | 'missed' | 'cancelled';
+  reportedBy: string;
+  reportedDate: string;
+  escalationLevel: 'none' | 'anganwadi' | 'district' | 'state';
+  completionDetails?: {
+    activitiesCompleted: string[];
+    issuesEncountered: string[];
+    notes?: string;
+  };
+}
+
 interface AppContextType {
   language: 'en' | 'hi';
   setLanguage: (lang: 'en' | 'hi') => void;
