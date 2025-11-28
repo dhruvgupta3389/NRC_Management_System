@@ -44,15 +44,22 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         }),
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        console.error('❌ Login failed:', data.error);
-        alert(data?.error || 'Invalid credentials. Please try again.');
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('❌ Failed to parse response:', parseError);
+        alert('Server error. Please try again.');
         setIsLoading(false);
         return;
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        console.error('❌ Login failed:', data?.error);
+        alert(data?.error || 'Invalid credentials. Please try again.');
+        setIsLoading(false);
+        return;
+      }
 
       if (!data.user || !data.token) {
         console.error('❌ Invalid response data');
@@ -217,7 +224,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Employee ID • कर्मचारी आईडी <span className="text-gray-400 text-xs">(optional)</span>
+                  Employee ID • क��्मचारी आईडी <span className="text-gray-400 text-xs">(optional)</span>
                 </label>
                 <input
                   type="text"
