@@ -44,15 +44,22 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         }),
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        console.error('❌ Login failed:', data.error);
-        alert(data?.error || 'Invalid credentials. Please try again.');
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('❌ Failed to parse response:', parseError);
+        alert('Server error. Please try again.');
         setIsLoading(false);
         return;
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        console.error('❌ Login failed:', data?.error);
+        alert(data?.error || 'Invalid credentials. Please try again.');
+        setIsLoading(false);
+        return;
+      }
 
       if (!data.user || !data.token) {
         console.error('❌ Invalid response data');
@@ -302,12 +309,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 )}
                 {selectedRole === 'supervisor' && (
                   <div className="bg-white p-2 rounded border">
-                    <strong>Supervisor:</strong> SUP001 / supervisor1 / super123
+                    <strong>Supervisor:</strong> SUP001 / supervisor1 / worker123
                   </div>
                 )}
                 {selectedRole === 'hospital' && (
                   <div className="bg-white p-2 rounded border">
-                    <strong>Hospital:</strong> HOSP001 / hospital1 / hosp123
+                    <strong>Hospital:</strong> HOSP001 / hospital1 / worker123
                   </div>
                 )}
               </div>
