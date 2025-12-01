@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { csvManager } from '@/lib/csvManager';
 
 export async function PUT(
   request: NextRequest,
@@ -25,33 +16,21 @@ export async function PUT(
       patient_name: body.patientName || null,
       patient_type: body.patientType || null,
       nutrition_status: body.nutritionStatus || null,
-      hospital_name: body.hospitalName || null,
-      updated_at: new Date().toISOString()
+      hospital_name: body.hospitalName || null
     };
 
-    const { data, error } = await supabase
-      .from('beds')
-      .update(updateData)
-      .eq('id', id)
-      .select();
+    const success = csvManager.updateCSV('beds.csv', id, updateData);
 
-    if (error) {
-      console.error('❌ Error updating bed:', error);
-      return NextResponse.json(
-        { error: 'Failed to update bed' },
-        { status: 500 }
-      );
-    }
-
-    if (!data || data.length === 0) {
+    if (success) {
+      console.log('✅ Bed updated successfully:', id);
+      const updatedBed = csvManager.findOne('beds.csv', { id });
+      return NextResponse.json(updatedBed, { status: 200 });
+    } else {
       return NextResponse.json(
         { error: 'Bed not found' },
         { status: 404 }
       );
     }
-
-    console.log('✅ Bed updated successfully:', id);
-    return NextResponse.json(data[0], { status: 200 });
   } catch (err) {
     console.error('❌ Unexpected error:', err);
     return NextResponse.json(
