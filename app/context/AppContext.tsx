@@ -70,7 +70,6 @@ export interface Notification {
   date: string;
 }
 
-// Additional exported domain types used by components
 export interface Anganwadi {
   id: string;
   name: string;
@@ -371,7 +370,7 @@ const translations = {
     'nav.patientRegistration': 'रोगी पंजीकरण',
     'nav.bedAvailability': 'बिस्तर उपलब्धता',
     'nav.notifications': 'सूचनाएं',
-    'common.name': 'ना��',
+    'common.name': 'नाम',
     'common.age': 'आयु',
     'common.contact': 'संपर्क',
     'common.address': 'पता',
@@ -440,7 +439,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Loading all data from CSV files...');
+      console.log('🔄 Loading all data from API...');
 
       try {
         const patientsData = await apiCall('/patients');
@@ -468,9 +467,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
       }
 
-      console.log('✅ All data loaded successfully from CSV files');
+      console.log('✅ All data loaded successfully');
     } catch (err) {
-      console.error('❌ Failed to load data from CSV:', err);
+      console.error('❌ Failed to load data:', err);
       setError('Failed to load data. Please check if the server is running.');
     } finally {
       setLoading(false);
@@ -804,4 +803,3 @@ export const useApp = () => {
   }
   return context;
 };
-//11

@@ -1,34 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { csvManager } from '@/lib/csvManager';
 
+async function getNotificationsByRoleFromSupabase(role: string) {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) return null;
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_role', role)
+      .order('notification_date', { ascending: false })
+      .limit(100);
+
+    if (error) return null;
+    return data || [];
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { role: string } }
 ) {
   try {
     const { role } = params;
-    console.log(`📊 Fetching notifications for role ${role} from CSV...`);
 
-    const notifications = csvManager.findByField('notifications.csv', 'user_role', role);
+    // Try Supabase first
+    let notifications = await getNotificationsByRoleFromSupabase(role);
 
-    const transformedNotifications = notifications.map(notification => ({
-      id: notification.id,
-      userRole: notification.user_role,
-      type: notification.type,
-      title: notification.title,
-      message: notification.message,
-      priority: notification.priority,
-      actionRequired: notification.action_required === 'true',
-      read: notification.read_status === 'true',
-      date: notification.date
-    }));
+    // Fallback to CSV
+    if (!notifications) {
+      notifications = csvManager.readCSV('notifications.csv') || [];
+      notifications = notifications.filter((n: any) => n.user_role === role);
+      notifications = notifications.slice(0, 100);
+    }
 
-    console.log(`✅ Successfully retrieved ${transformedNotifications.length} notifications from CSV`);
-    return NextResponse.json(transformedNotifications);
+    console.log(`✅ Fetched ${notifications.length} notifications for role ${role}`);
+    return NextResponse.json(notifications, { status: 200 });
   } catch (err) {
-    console.error('❌ Error fetching notifications:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to fetch notifications' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

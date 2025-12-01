@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sign, type Secret } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import { csvManager } from '@/lib/csvManager';
 
@@ -7,7 +7,7 @@ function parseExpires(input: string | number | undefined): number {
   if (typeof input === 'number' && isFinite(input)) return input;
   const str = String(input ?? '').trim();
   const match = /^(\d+)\s*([smhdwy])?$/i.exec(str);
-  if (!match) return 24 * 60 * 60; // default 24h
+  if (!match) return 24 * 60 * 60;
   const value = parseInt(match[1], 10);
   const unit = (match[2] || 's').toLowerCase();
   switch (unit) {
@@ -18,6 +18,38 @@ function parseExpires(input: string | number | undefined): number {
     case 'w': return value * 60 * 60 * 24 * 7;
     case 'y': return value * 60 * 60 * 24 * 365;
     default: return value;
+  }
+}
+
+async function getUserFromSupabase(username: string, employee_id?: string) {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.log('Supabase not configured, using CSV');
+      return null;
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    let query = supabase.from('users').select('*').eq('username', username).eq('is_active', true);
+
+    if (employee_id) {
+      query = query.eq('employee_id', employee_id);
+    }
+
+    const { data, error } = await query.limit(1);
+
+    if (error) {
+      console.log('Supabase query failed, using CSV:', error.message);
+      return null;
+    }
+
+    return data?.[0] || null;
+  } catch (error) {
+    console.log('Supabase import/query failed, using CSV:', error);
+    return null;
   }
 }
 
@@ -44,16 +76,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const searchCriteria: any = {
-      username: username,
-      is_active: 'true'
-    };
+    // Try Supabase first, fallback to CSV
+    let user = await getUserFromSupabase(username, employee_id);
 
-    if (employee_id) {
-      searchCriteria.employee_id = employee_id;
+    if (!user) {
+      const searchCriteria: any = {
+        username: username,
+        is_active: 'true'
+      };
+      if (employee_id) {
+        searchCriteria.employee_id = employee_id;
+      }
+      user = csvManager.findOne('users.csv', searchCriteria);
     }
-
-    const user = csvManager.findOne('users.csv', searchCriteria);
 
     if (!user) {
       console.log(`⚠️ User not found: ${username}`);
@@ -63,7 +98,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate password
     let validPassword = false;
 
     if (user.password_hash && user.password_hash.startsWith('$2')) {
@@ -88,7 +122,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check JWT_SECRET
     const jwtSecret = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
     if (!process.env.JWT_SECRET) {
       console.warn('⚠️ Using default JWT_SECRET - set JWT_SECRET env variable in production');

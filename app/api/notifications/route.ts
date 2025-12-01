@@ -1,46 +1,122 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
 import { csvManager } from '@/lib/csvManager';
+
+async function getNotificationsFromSupabase(userId: string) {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) return null;
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('notification_date', { ascending: false })
+      .limit(100);
+
+    if (error) return null;
+    return data || [];
+  } catch (error) {
+    return null;
+  }
+}
+
+async function createNotificationInSupabase(data: any) {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) return null;
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: result, error } = await supabase.from('notifications').insert([data]).select();
+
+    if (error) return null;
+    return result?.[0] || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'userId parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    // Try Supabase first
+    let notifications = await getNotificationsFromSupabase(userId);
+
+    // Fallback to CSV
+    if (!notifications) {
+      notifications = csvManager.readCSV('notifications.csv') || [];
+      notifications = notifications.filter((n: any) => n.user_id === userId);
+      notifications = notifications.slice(0, 100);
+    }
+
+    console.log(`✅ Fetched ${notifications.length} notifications for user ${userId}`);
+    return NextResponse.json(notifications, { status: 200 });
+  } catch (err) {
+    console.error('❌ Unexpected error:', err);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.log('📝 Received notification data from frontend:', JSON.stringify(body, null, 2));
-
     const notificationData = {
-      id: uuidv4(),
+      user_id: body.userId,
       user_role: body.userRole,
-      type: body.type,
+      notification_type: body.type,
       title: body.title,
       message: body.message,
       priority: body.priority || 'medium',
-      action_required: (body.actionRequired || false).toString(),
-      read_status: 'false',
-      date: body.date || new Date().toISOString().split('T')[0],
-      created_at: new Date().toISOString()
+      action_required: body.actionRequired || false,
+      is_read: false,
+      notification_date: new Date().toISOString()
     };
 
-    console.log('🔄 Processing notification data for CSV storage:', JSON.stringify(notificationData, null, 2));
+    // Try Supabase first
+    let result = await createNotificationInSupabase(notificationData);
 
-    const success = csvManager.writeToCSV('notifications.csv', notificationData);
+    // Fallback to CSV
+    if (!result) {
+      const csvData = {
+        id: `notif-${Date.now()}`,
+        ...notificationData,
+        action_required: notificationData.action_required ? 'true' : 'false',
+        is_read: 'false'
+      };
+      
+      const success = csvManager.writeToCSV('notifications.csv', csvData);
+      result = success ? csvData : null;
+    }
 
-    if (success) {
-      console.log('✅ Notification successfully saved to CSV with ID:', notificationData.id);
-      return NextResponse.json(
-        {
-          message: 'Notification created successfully',
-          id: notificationData.id
-        },
-        { status: 201 }
-      );
+    if (result) {
+      console.log('✅ Notification created successfully:', result.id);
+      return NextResponse.json(result, { status: 201 });
     } else {
-      throw new Error('Failed to save notification to CSV');
+      throw new Error('Failed to create notification');
     }
   } catch (err) {
-    console.error('❌ Error creating notification:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to create notification' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
