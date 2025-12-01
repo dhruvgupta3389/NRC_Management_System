@@ -1,6 +1,16 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface User {
   id: string;
@@ -70,7 +80,6 @@ export interface Notification {
   date: string;
 }
 
-// Additional exported domain types used by components
 export interface Anganwadi {
   id: string;
   name: string;
@@ -371,7 +380,7 @@ const translations = {
     'nav.patientRegistration': 'रोगी पंजीकरण',
     'nav.bedAvailability': 'बिस्तर उपलब्धता',
     'nav.notifications': 'सूचनाएं',
-    'common.name': 'ना��',
+    'common.name': 'नाम',
     'common.age': 'आयु',
     'common.contact': 'संपर्क',
     'common.address': 'पता',
@@ -440,7 +449,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Loading all data from CSV files...');
+      console.log('🔄 Loading all data from Supabase...');
 
       try {
         const patientsData = await apiCall('/patients');
@@ -458,9 +467,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         console.error('❌ Failed to load beds:', err);
       }
 
-      if (userRole) {
+      if (userRole && currentUser) {
         try {
-          const notificationsData = await apiCall(`/notifications/role/${userRole}`);
+          const notificationsData = await apiCall(`/notifications?userId=${currentUser.id}`);
           setNotifications(notificationsData);
           console.log('✅ Notifications loaded:', notificationsData.length);
         } catch (err) {
@@ -468,10 +477,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
       }
 
-      console.log('✅ All data loaded successfully from CSV files');
+      console.log('✅ All data loaded successfully from Supabase');
     } catch (err) {
-      console.error('❌ Failed to load data from CSV:', err);
-      setError('Failed to load data. Please check if the server is running.');
+      console.error('❌ Failed to load data from Supabase:', err);
+      setError('Failed to load data. Please check if Supabase is connected.');
     } finally {
       setLoading(false);
     }
@@ -521,7 +530,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addPatient = async (patientData: Omit<Patient, 'id' | 'registrationNumber' | 'admissionDate'>) => {
     try {
-      console.log('📝 Adding new patient via API...');
+      console.log('📝 Adding new patient via Supabase...');
       const response = await apiCall('/patients', {
         method: 'POST',
         body: JSON.stringify(patientData),
@@ -537,7 +546,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const updatePatient = async (id: string, updates: Partial<Patient>) => {
     try {
-      console.log(`📝 Updating patient ${id} via API...`);
+      console.log(`📝 Updating patient ${id} via Supabase...`);
       await apiCall(`/patients/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates),
@@ -553,7 +562,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const updateBed = async (id: string, updates: Partial<Bed>) => {
     try {
-      console.log(`📝 Updating bed ${id} via API...`);
+      console.log(`📝 Updating bed ${id} via Supabase...`);
       await apiCall(`/beds/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates),
@@ -569,7 +578,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const markNotificationRead = async (id: string) => {
     try {
-      console.log(`📝 Marking notification ${id} as read via API...`);
+      console.log(`📝 Marking notification ${id} as read via Supabase...`);
       await apiCall(`/notifications/${id}/read`, {
         method: 'PUT',
       });
@@ -583,7 +592,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addNotification = async (notificationData: Omit<Notification, 'id'>) => {
     try {
-      console.log('📝 Adding new notification via API...');
+      console.log('📝 Adding new notification via Supabase...');
       await apiCall('/notifications', {
         method: 'POST',
         body: JSON.stringify(notificationData),
@@ -804,4 +813,3 @@ export const useApp = () => {
   }
   return context;
 };
-//11
