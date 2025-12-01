@@ -1,51 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
-import { csvManager } from '@/lib/csvManager';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function GET(request: NextRequest) {
   try {
-    const patients = csvManager.readCSV('patients.csv');
+    const { searchParams } = new URL(request.url);
+    const registeredBy = searchParams.get('registeredBy');
 
-    const transformedPatients = patients
-      .filter(patient => patient.is_active === 'true')
-      .map(patient => ({
-        id: patient.id,
-        registrationNumber: patient.registration_number,
-        aadhaarNumber: patient.aadhaar_number,
-        name: patient.name,
-        age: parseInt(patient.age),
-        type: patient.type,
-        pregnancyWeek: patient.pregnancy_week ? parseInt(patient.pregnancy_week) : undefined,
-        contactNumber: patient.contact_number,
-        emergencyContact: patient.emergency_contact,
-        address: patient.address,
-        weight: parseFloat(patient.weight),
-        height: parseFloat(patient.height),
-        bloodPressure: patient.blood_pressure,
-        temperature: patient.temperature ? parseFloat(patient.temperature) : undefined,
-        hemoglobin: patient.hemoglobin ? parseFloat(patient.hemoglobin) : undefined,
-        nutritionStatus: patient.nutrition_status,
-        medicalHistory: csvManager.safeJsonParse(patient.medical_history, []),
-        symptoms: csvManager.safeJsonParse(patient.symptoms, []),
-        documents: csvManager.safeJsonParse(patient.documents, []),
-        photos: csvManager.safeJsonParse(patient.photos, []),
-        remarks: patient.remarks,
-        riskScore: parseInt(patient.risk_score) || 0,
-        nutritionalDeficiency: csvManager.safeJsonParse(patient.nutritional_deficiency, []),
-        bedId: patient.bed_id,
-        lastVisitDate: patient.last_visit_date,
-        nextVisitDate: patient.next_visit_date,
-        registeredBy: patient.registered_by,
-        registrationDate: patient.registration_date,
-        admissionDate: patient.registration_date,
-        nextVisit: patient.next_visit_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-      }));
+    let query = supabase
+      .from('patients')
+      .select('*')
+      .eq('is_active', true);
 
-    return NextResponse.json(transformedPatients);
+    if (registeredBy) {
+      query = query.eq('registered_by', registeredBy);
+    }
+
+    const { data, error } = await query.order('registration_date', { ascending: false });
+
+    if (error) {
+      console.error('❌ Error fetching patients:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch patients' },
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Fetched ${data?.length || 0} patients`);
+    return NextResponse.json(data || [], { status: 200 });
   } catch (err) {
-    console.error('❌ Error fetching patients:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: 'Failed to fetch patients' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -55,85 +49,55 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.name || !body.age || !body.type || !body.contactNumber || !body.address || !body.weight || !body.height || !body.nutritionStatus) {
-      return NextResponse.json(
-        { errors: [{ message: 'Missing required fields' }] },
-        { status: 400 }
-      );
-    }
-
-    const patientId = uuidv4();
-    const registrationNumber = `NRC${Date.now()}`;
+    const registrationNumber = `REG-${Date.now()}`;
 
     const patientData = {
-      id: patientId,
       registration_number: registrationNumber,
-      aadhaar_number: body.aadhaarNumber || '',
       name: body.name,
-      age: body.age.toString(),
+      age: body.age,
       type: body.type,
-      pregnancy_week: body.pregnancyWeek ? body.pregnancyWeek.toString() : '',
+      pregnancy_week: body.pregnancyWeek,
       contact_number: body.contactNumber,
-      emergency_contact: body.emergencyContact || body.contactNumber,
+      emergency_contact: body.emergencyContact,
       address: body.address,
-      weight: body.weight.toString(),
-      height: body.height.toString(),
-      blood_pressure: body.bloodPressure || '',
-      temperature: body.temperature ? body.temperature.toString() : '',
-      hemoglobin: body.hemoglobin ? body.hemoglobin.toString() : '',
+      weight: body.weight,
+      height: body.height,
+      blood_pressure: body.bloodPressure,
+      temperature: body.temperature,
+      hemoglobin: body.hemoglobin,
       nutrition_status: body.nutritionStatus,
-      medical_history: JSON.stringify(body.medicalHistory || []),
-      symptoms: JSON.stringify(body.symptoms || []),
-      documents: JSON.stringify(body.documents || []),
-      photos: JSON.stringify(body.photos || []),
-      remarks: body.remarks || '',
-      risk_score: (body.riskScore || 0).toString(),
-      nutritional_deficiency: JSON.stringify(body.nutritionalDeficiency || []),
-      bed_id: '',
-      last_visit_date: '',
-      next_visit_date: body.nextVisit || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      registered_by: body.registeredBy || 'SYSTEM',
-      registration_date: new Date().toISOString().split('T')[0],
-      is_active: 'true',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      medical_history: body.medicalHistory || [],
+      symptoms: body.symptoms || [],
+      remarks: body.remarks,
+      risk_score: body.riskScore,
+      nutritional_deficiency: body.nutritionalDeficiency || [],
+      registered_by: body.registeredBy,
+      registration_date: new Date().toISOString(),
+      admission_date: body.admissionDate || new Date().toISOString().split('T')[0],
+      aadhaar_number: body.aadhaarNumber,
+      last_visit_date: body.lastVisitDate,
+      next_visit_date: body.nextVisitDate
     };
 
-    const success = csvManager.writeToCSV('patients.csv', patientData);
+    const { data, error } = await supabase
+      .from('patients')
+      .insert([patientData])
+      .select();
 
-    if (success) {
-      if (parseInt(patientData.risk_score) > 80 || patientData.nutrition_status === 'severely_malnourished') {
-        const notificationData = {
-          id: uuidv4(),
-          user_role: 'supervisor',
-          type: 'high_risk_alert',
-          title: 'High Risk Patient Registered',
-          message: `New high-risk patient ${patientData.name} has been registered with ${patientData.nutrition_status} status.`,
-          priority: 'high',
-          action_required: 'true',
-          read_status: 'false',
-          date: new Date().toISOString().split('T')[0],
-          created_at: new Date().toISOString()
-        };
-
-        csvManager.writeToCSV('notifications.csv', notificationData);
-      }
-
+    if (error) {
+      console.error('❌ Error creating patient:', error);
       return NextResponse.json(
-        {
-          message: 'Patient created successfully',
-          id: patientId,
-          registrationNumber: registrationNumber
-        },
-        { status: 201 }
+        { error: 'Failed to create patient' },
+        { status: 500 }
       );
-    } else {
-      throw new Error('Failed to save patient data to CSV');
     }
+
+    console.log('✅ Patient created successfully:', data?.[0]?.id);
+    return NextResponse.json(data?.[0], { status: 201 });
   } catch (err) {
-    console.error('❌ Error creating patient:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: 'Failed to create patient' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
