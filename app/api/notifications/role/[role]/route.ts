@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { csvManager } from '@/lib/csvManager';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function GET(
   request: NextRequest,
@@ -7,28 +16,36 @@ export async function GET(
 ) {
   try {
     const { role } = params;
-    console.log(`📊 Fetching notifications for role ${role} from CSV...`);
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
 
-    const notifications = csvManager.findByField('notifications.csv', 'user_role', role);
+    let query = supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_role', role)
+      .order('notification_date', { ascending: false })
+      .limit(100);
 
-    const transformedNotifications = notifications.map(notification => ({
-      id: notification.id,
-      userRole: notification.user_role,
-      type: notification.type,
-      title: notification.title,
-      message: notification.message,
-      priority: notification.priority,
-      actionRequired: notification.action_required === 'true',
-      read: notification.read_status === 'true',
-      date: notification.date
-    }));
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
 
-    console.log(`✅ Successfully retrieved ${transformedNotifications.length} notifications from CSV`);
-    return NextResponse.json(transformedNotifications);
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('❌ Error fetching notifications by role:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch notifications' },
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Fetched ${data?.length || 0} notifications for role ${role}`);
+    return NextResponse.json(data || [], { status: 200 });
   } catch (err) {
-    console.error('❌ Error fetching notifications:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to fetch notifications' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
