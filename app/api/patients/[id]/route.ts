@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { csvManager } from '@/lib/csvManager';
 
 export async function PUT(
   request: NextRequest,
@@ -32,40 +23,28 @@ export async function PUT(
       temperature: body.temperature,
       hemoglobin: body.hemoglobin,
       nutrition_status: body.nutritionStatus,
-      medical_history: body.medicalHistory,
-      symptoms: body.symptoms,
+      medical_history: body.medicalHistory ? JSON.stringify(body.medicalHistory) : undefined,
+      symptoms: body.symptoms ? JSON.stringify(body.symptoms) : undefined,
       remarks: body.remarks,
       risk_score: body.riskScore,
-      nutritional_deficiency: body.nutritionalDeficiency,
+      nutritional_deficiency: body.nutritionalDeficiency ? JSON.stringify(body.nutritionalDeficiency) : undefined,
       last_visit_date: body.lastVisitDate,
       next_visit_date: body.nextVisitDate,
-      bed_id: body.bedId,
-      updated_at: new Date().toISOString()
+      bed_id: body.bedId
     };
 
-    const { data, error } = await supabase
-      .from('patients')
-      .update(updateData)
-      .eq('id', id)
-      .select();
+    const success = csvManager.updateCSV('patients.csv', id, updateData);
 
-    if (error) {
-      console.error('❌ Error updating patient:', error);
-      return NextResponse.json(
-        { error: 'Failed to update patient' },
-        { status: 500 }
-      );
-    }
-
-    if (!data || data.length === 0) {
+    if (success) {
+      console.log('✅ Patient updated successfully:', id);
+      const updatedPatient = csvManager.findOne('patients.csv', { id });
+      return NextResponse.json(updatedPatient, { status: 200 });
+    } else {
       return NextResponse.json(
         { error: 'Patient not found' },
         { status: 404 }
       );
     }
-
-    console.log('✅ Patient updated successfully:', id);
-    return NextResponse.json(data[0], { status: 200 });
   } catch (err) {
     console.error('❌ Unexpected error:', err);
     return NextResponse.json(
