@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { csvManager } from '@/lib/csvManager';
 
+async function updateBedInSupabase(id: string, data: any) {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) return null;
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: result, error } = await supabase
+      .from('beds')
+      .update(data)
+      .eq('id', id)
+      .select();
+
+    if (error) return null;
+    return result?.[0] || null;
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -19,12 +41,20 @@ export async function PUT(
       hospital_name: body.hospitalName || null
     };
 
-    const success = csvManager.updateCSV('beds.csv', id, updateData);
+    // Try Supabase first
+    let result = await updateBedInSupabase(id, updateData);
 
-    if (success) {
+    // Fallback to CSV
+    if (!result) {
+      const success = csvManager.updateCSV('beds.csv', id, updateData);
+      if (success) {
+        result = csvManager.findOne('beds.csv', { id });
+      }
+    }
+
+    if (result) {
       console.log('✅ Bed updated successfully:', id);
-      const updatedBed = csvManager.findOne('beds.csv', { id });
-      return NextResponse.json(updatedBed, { status: 200 });
+      return NextResponse.json(result, { status: 200 });
     } else {
       return NextResponse.json(
         { error: 'Bed not found' },
