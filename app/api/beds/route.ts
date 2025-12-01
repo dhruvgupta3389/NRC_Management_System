@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { csvManager } from '@/lib/csvManager';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,30 +7,18 @@ export async function GET(request: NextRequest) {
     const hospitalId = searchParams.get('hospitalId');
     const status = searchParams.get('status');
 
-    let query = supabase
-      .from('beds')
-      .select('*');
+    let beds = csvManager.readCSV('beds.csv') || [];
 
     if (hospitalId) {
-      query = query.eq('hospital_id', hospitalId);
+      beds = beds.filter((b: any) => b.hospital_id === hospitalId);
     }
 
     if (status) {
-      query = query.eq('status', status);
+      beds = beds.filter((b: any) => b.status === status);
     }
 
-    const { data, error } = await query.order('bed_number', { ascending: true });
-
-    if (error) {
-      console.error('❌ Error fetching beds:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch beds' },
-        { status: 500 }
-      );
-    }
-
-    console.log(`✅ Fetched ${data?.length || 0} beds`);
-    return NextResponse.json(data || [], { status: 200 });
+    console.log(`✅ Fetched ${beds.length} beds`);
+    return NextResponse.json(beds, { status: 200 });
   } catch (err) {
     console.error('❌ Unexpected error:', err);
     return NextResponse.json(
@@ -54,6 +33,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const bedData = {
+      id: `bed-${Date.now()}`,
       hospital_id: body.hospitalId,
       bed_number: body.bedNumber,
       ward: body.ward,
@@ -66,21 +46,14 @@ export async function POST(request: NextRequest) {
       hospital_name: body.hospitalName || null
     };
 
-    const { data, error } = await supabase
-      .from('beds')
-      .insert([bedData])
-      .select();
+    const success = csvManager.writeToCSV('beds.csv', bedData);
 
-    if (error) {
-      console.error('❌ Error creating bed:', error);
-      return NextResponse.json(
-        { error: 'Failed to create bed' },
-        { status: 500 }
-      );
+    if (success) {
+      console.log('✅ Bed created successfully:', bedData.id);
+      return NextResponse.json(bedData, { status: 201 });
+    } else {
+      throw new Error('Failed to write bed data to CSV');
     }
-
-    console.log('✅ Bed created successfully:', data?.[0]?.id);
-    return NextResponse.json(data?.[0], { status: 201 });
   } catch (err) {
     console.error('❌ Unexpected error:', err);
     return NextResponse.json(
