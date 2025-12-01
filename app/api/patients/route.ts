@@ -1,41 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { csvManager } from '@/lib/csvManager';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const registeredBy = searchParams.get('registeredBy');
 
-    let query = supabase
-      .from('patients')
-      .select('*')
-      .eq('is_active', true);
+    let patients = csvManager.readCSV('patients.csv') || [];
 
     if (registeredBy) {
-      query = query.eq('registered_by', registeredBy);
+      patients = patients.filter((p: any) => p.registered_by === registeredBy);
     }
 
-    const { data, error } = await query.order('registration_date', { ascending: false });
-
-    if (error) {
-      console.error('❌ Error fetching patients:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch patients' },
-        { status: 500 }
-      );
-    }
-
-    console.log(`✅ Fetched ${data?.length || 0} patients`);
-    return NextResponse.json(data || [], { status: 200 });
+    console.log(`✅ Fetched ${patients.length} patients`);
+    return NextResponse.json(patients, { status: 200 });
   } catch (err) {
     console.error('❌ Unexpected error:', err);
     return NextResponse.json(
@@ -52,6 +30,7 @@ export async function POST(request: NextRequest) {
     const registrationNumber = `REG-${Date.now()}`;
 
     const patientData = {
+      id: `patient-${Date.now()}`,
       registration_number: registrationNumber,
       name: body.name,
       age: body.age,
@@ -66,11 +45,11 @@ export async function POST(request: NextRequest) {
       temperature: body.temperature,
       hemoglobin: body.hemoglobin,
       nutrition_status: body.nutritionStatus,
-      medical_history: body.medicalHistory || [],
-      symptoms: body.symptoms || [],
+      medical_history: body.medicalHistory ? JSON.stringify(body.medicalHistory) : '[]',
+      symptoms: body.symptoms ? JSON.stringify(body.symptoms) : '[]',
       remarks: body.remarks,
       risk_score: body.riskScore,
-      nutritional_deficiency: body.nutritionalDeficiency || [],
+      nutritional_deficiency: body.nutritionalDeficiency ? JSON.stringify(body.nutritionalDeficiency) : '[]',
       registered_by: body.registeredBy,
       registration_date: new Date().toISOString(),
       admission_date: body.admissionDate || new Date().toISOString().split('T')[0],
@@ -79,21 +58,14 @@ export async function POST(request: NextRequest) {
       next_visit_date: body.nextVisitDate
     };
 
-    const { data, error } = await supabase
-      .from('patients')
-      .insert([patientData])
-      .select();
+    const success = csvManager.writeToCSV('patients.csv', patientData);
 
-    if (error) {
-      console.error('❌ Error creating patient:', error);
-      return NextResponse.json(
-        { error: 'Failed to create patient' },
-        { status: 500 }
-      );
+    if (success) {
+      console.log('✅ Patient created successfully:', patientData.id);
+      return NextResponse.json(patientData, { status: 201 });
+    } else {
+      throw new Error('Failed to write patient data to CSV');
     }
-
-    console.log('✅ Patient created successfully:', data?.[0]?.id);
-    return NextResponse.json(data?.[0], { status: 201 });
   } catch (err) {
     console.error('❌ Unexpected error:', err);
     return NextResponse.json(
