@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { csvManager } from '@/lib/csvManager';
 
+async function updatePatientInSupabase(id: string, data: any) {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) return null;
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: result, error } = await supabase
+      .from('patients')
+      .update(data)
+      .eq('id', id)
+      .select();
+
+    if (error) return null;
+    return result?.[0] || null;
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -23,22 +45,37 @@ export async function PUT(
       temperature: body.temperature,
       hemoglobin: body.hemoglobin,
       nutrition_status: body.nutritionStatus,
-      medical_history: body.medicalHistory ? JSON.stringify(body.medicalHistory) : undefined,
-      symptoms: body.symptoms ? JSON.stringify(body.symptoms) : undefined,
+      medical_history: body.medicalHistory,
+      symptoms: body.symptoms,
       remarks: body.remarks,
       risk_score: body.riskScore,
-      nutritional_deficiency: body.nutritionalDeficiency ? JSON.stringify(body.nutritionalDeficiency) : undefined,
+      nutritional_deficiency: body.nutritionalDeficiency,
       last_visit_date: body.lastVisitDate,
       next_visit_date: body.nextVisitDate,
       bed_id: body.bedId
     };
 
-    const success = csvManager.updateCSV('patients.csv', id, updateData);
+    // Try Supabase first
+    let result = await updatePatientInSupabase(id, updateData);
 
-    if (success) {
+    // Fallback to CSV
+    if (!result) {
+      const csvUpdateData = {
+        ...updateData,
+        medical_history: updateData.medical_history ? JSON.stringify(updateData.medical_history) : undefined,
+        symptoms: updateData.symptoms ? JSON.stringify(updateData.symptoms) : undefined,
+        nutritional_deficiency: updateData.nutritional_deficiency ? JSON.stringify(updateData.nutritional_deficiency) : undefined
+      };
+
+      const success = csvManager.updateCSV('patients.csv', id, csvUpdateData);
+      if (success) {
+        result = csvManager.findOne('patients.csv', { id });
+      }
+    }
+
+    if (result) {
       console.log('✅ Patient updated successfully:', id);
-      const updatedPatient = csvManager.findOne('patients.csv', { id });
-      return NextResponse.json(updatedPatient, { status: 200 });
+      return NextResponse.json(result, { status: 200 });
     } else {
       return NextResponse.json(
         { error: 'Patient not found' },
