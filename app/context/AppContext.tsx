@@ -1,16 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface User {
   id: string;
@@ -449,7 +439,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Loading all data from Supabase...');
+      console.log('🔄 Loading all data from API...');
 
       try {
         const patientsData = await apiCall('/patients');
@@ -467,9 +457,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         console.error('❌ Failed to load beds:', err);
       }
 
-      if (userRole && currentUser) {
+      if (userRole) {
         try {
-          const notificationsData = await apiCall(`/notifications?userId=${currentUser.id}`);
+          const notificationsData = await apiCall(`/notifications/role/${userRole}`);
           setNotifications(notificationsData);
           console.log('✅ Notifications loaded:', notificationsData.length);
         } catch (err) {
@@ -477,10 +467,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
       }
 
-      console.log('✅ All data loaded successfully from Supabase');
+      console.log('✅ All data loaded successfully');
     } catch (err) {
-      console.error('❌ Failed to load data from Supabase:', err);
-      setError('Failed to load data. Please check if Supabase is connected.');
+      console.error('❌ Failed to load data:', err);
+      setError('Failed to load data. Please check if the server is running.');
     } finally {
       setLoading(false);
     }
@@ -530,7 +520,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addPatient = async (patientData: Omit<Patient, 'id' | 'registrationNumber' | 'admissionDate'>) => {
     try {
-      console.log('📝 Adding new patient via Supabase...');
+      console.log('📝 Adding new patient via API...');
       const response = await apiCall('/patients', {
         method: 'POST',
         body: JSON.stringify(patientData),
@@ -546,7 +536,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const updatePatient = async (id: string, updates: Partial<Patient>) => {
     try {
-      console.log(`📝 Updating patient ${id} via Supabase...`);
+      console.log(`📝 Updating patient ${id} via API...`);
       await apiCall(`/patients/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates),
@@ -562,7 +552,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const updateBed = async (id: string, updates: Partial<Bed>) => {
     try {
-      console.log(`📝 Updating bed ${id} via Supabase...`);
+      console.log(`📝 Updating bed ${id} via API...`);
       await apiCall(`/beds/${id}`, {
         method: 'PUT',
         body: JSON.stringify(updates),
@@ -578,7 +568,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const markNotificationRead = async (id: string) => {
     try {
-      console.log(`📝 Marking notification ${id} as read via Supabase...`);
+      console.log(`📝 Marking notification ${id} as read via API...`);
       await apiCall(`/notifications/${id}/read`, {
         method: 'PUT',
       });
@@ -592,7 +582,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const addNotification = async (notificationData: Omit<Notification, 'id'>) => {
     try {
-      console.log('📝 Adding new notification via Supabase...');
+      console.log('📝 Adding new notification via API...');
       await apiCall('/notifications', {
         method: 'POST',
         body: JSON.stringify(notificationData),
