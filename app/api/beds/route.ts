@@ -1,39 +1,90 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { csvManager } from '@/lib/csvManager';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('📊 Fetching all beds from CSV...');
+    const { searchParams } = new URL(request.url);
+    const hospitalId = searchParams.get('hospitalId');
+    const status = searchParams.get('status');
 
-    const beds = csvManager.readCSV('beds.csv');
-    const patients = csvManager.readCSV('patients.csv');
-    const hospitals = csvManager.readCSV('hospitals.csv');
+    let query = supabase
+      .from('beds')
+      .select('*');
 
-    const transformedBeds = beds.map(bed => {
-      const patient = bed.patient_id ? patients.find((p: Record<string, any>) => p.id === bed.patient_id) : null;
-      const hospital = hospitals.find((h: Record<string, any>) => h.id === bed.hospital_id);
+    if (hospitalId) {
+      query = query.eq('hospital_id', hospitalId);
+    }
 
-      return {
-        id: bed.id,
-        hospitalId: bed.hospital_id,
-        number: bed.number,
-        ward: bed.ward,
-        status: bed.status,
-        patientId: bed.patient_id || undefined,
-        admissionDate: bed.admission_date || undefined,
-        patientName: patient?.name,
-        patientType: patient?.type,
-        nutritionStatus: patient?.nutrition_status,
-        hospitalName: hospital?.name
-      };
-    });
+    if (status) {
+      query = query.eq('status', status);
+    }
 
-    console.log(`✅ Successfully retrieved ${transformedBeds.length} beds from CSV`);
-    return NextResponse.json(transformedBeds);
+    const { data, error } = await query.order('bed_number', { ascending: true });
+
+    if (error) {
+      console.error('❌ Error fetching beds:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch beds' },
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Fetched ${data?.length || 0} beds`);
+    return NextResponse.json(data || [], { status: 200 });
   } catch (err) {
-    console.error('❌ Error fetching beds:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to fetch beds' },
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const bedData = {
+      hospital_id: body.hospitalId,
+      bed_number: body.bedNumber,
+      ward: body.ward,
+      status: body.status || 'available',
+      patient_id: body.patientId || null,
+      admission_date: body.admissionDate || null,
+      patient_name: body.patientName || null,
+      patient_type: body.patientType || null,
+      nutrition_status: body.nutritionStatus || null,
+      hospital_name: body.hospitalName || null
+    };
+
+    const { data, error } = await supabase
+      .from('beds')
+      .insert([bedData])
+      .select();
+
+    if (error) {
+      console.error('❌ Error creating bed:', error);
+      return NextResponse.json(
+        { error: 'Failed to create bed' },
+        { status: 500 }
+      );
+    }
+
+    console.log('✅ Bed created successfully:', data?.[0]?.id);
+    return NextResponse.json(data?.[0], { status: 201 });
+  } catch (err) {
+    console.error('❌ Unexpected error:', err);
+    return NextResponse.json(
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
