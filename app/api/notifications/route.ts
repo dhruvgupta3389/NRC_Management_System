@@ -1,46 +1,88 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
-import { csvManager } from '@/lib/csvManager';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'userId parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('notification_date', { ascending: false })
+      .limit(100);
+
+    if (error) {
+      console.error('❌ Error fetching notifications:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch notifications' },
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Fetched ${data?.length || 0} notifications for user ${userId}`);
+    return NextResponse.json(data || [], { status: 200 });
+  } catch (err) {
+    console.error('❌ Unexpected error:', err);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.log('📝 Received notification data from frontend:', JSON.stringify(body, null, 2));
-
     const notificationData = {
-      id: uuidv4(),
+      user_id: body.userId,
       user_role: body.userRole,
-      type: body.type,
+      notification_type: body.type,
       title: body.title,
       message: body.message,
       priority: body.priority || 'medium',
-      action_required: (body.actionRequired || false).toString(),
-      read_status: 'false',
-      date: body.date || new Date().toISOString().split('T')[0],
-      created_at: new Date().toISOString()
+      action_required: body.actionRequired || false,
+      is_read: false,
+      notification_date: new Date().toISOString()
     };
 
-    console.log('🔄 Processing notification data for CSV storage:', JSON.stringify(notificationData, null, 2));
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert([notificationData])
+      .select();
 
-    const success = csvManager.writeToCSV('notifications.csv', notificationData);
-
-    if (success) {
-      console.log('✅ Notification successfully saved to CSV with ID:', notificationData.id);
+    if (error) {
+      console.error('❌ Error creating notification:', error);
       return NextResponse.json(
-        {
-          message: 'Notification created successfully',
-          id: notificationData.id
-        },
-        { status: 201 }
+        { error: 'Failed to create notification' },
+        { status: 500 }
       );
-    } else {
-      throw new Error('Failed to save notification to CSV');
     }
+
+    console.log('✅ Notification created successfully:', data?.[0]?.id);
+    return NextResponse.json(data?.[0], { status: 201 });
   } catch (err) {
-    console.error('❌ Error creating notification:', err);
+    console.error('❌ Unexpected error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to create notification' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
