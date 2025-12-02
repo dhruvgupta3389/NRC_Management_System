@@ -7,7 +7,7 @@ import { useApp } from '../context/AppContext';
 const AnganwadiManagement: React.FC = () => {
   const { anganwadis, workers } = useApp();
 
-  const activeAnganwadis = anganwadis.filter(a => a.isActive);
+  const activeAnganwadis = anganwadis.filter(a => a.is_active);
 
   return (
     <div className="space-y-6">

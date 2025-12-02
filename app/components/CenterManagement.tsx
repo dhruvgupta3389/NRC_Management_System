@@ -10,7 +10,7 @@ const CenterManagement: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const getAnganwadiWorkers = (anganwadiId: string) => {
-    return workers.filter(worker => worker.anganwadiId === anganwadiId && worker.isActive);
+    return workers.filter(worker => worker.anganwadiId === anganwadiId && worker.is_active);
   };
 
   const AnganwadiDetailsModal = ({ anganwadi }: { anganwadi: Anganwadi }) => {
@@ -138,13 +138,13 @@ const CenterManagement: React.FC = () => {
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">{t('common.status')}</h4>
                 <div className="flex items-center space-x-2">
-                  {anganwadi.isActive ? (
+                  {anganwadi.is_active ? (
                     <CheckCircle className="w-4 h-4 text-green-600" />
                   ) : (
                     <XCircle className="w-4 h-4 text-red-600" />
                   )}
-                  <span className={`text-sm ${anganwadi.isActive ? 'text-green-600' : 'text-red-600'}`}>
-                    {anganwadi.isActive ? 'Active' : 'Inactive'}
+                  <span className={`text-sm ${anganwadi.is_active ? 'text-green-600' : 'text-red-600'}`}>
+                    {anganwadi.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
@@ -482,7 +482,7 @@ const CenterManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-green-600">Active Centers</p>
                 <p className="text-2xl font-bold text-green-800">
-                  {anganwadis.filter(a => a.isActive).length}
+                  {anganwadis.filter(a => a.is_active).length}
                 </p>
               </div>
             </div>
@@ -529,7 +529,7 @@ const CenterManagement: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {anganwadi.isActive ? (
+                  {anganwadi.is_active ? (
                     <CheckCircle className="w-5 h-5 text-green-600" />
                   ) : (
                     <XCircle className="w-5 h-5 text-red-600" />

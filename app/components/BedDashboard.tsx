@@ -153,7 +153,7 @@ const BedDashboard: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Pending Bed Requests ({pendingRequests.length})</h3>
           <div className="space-y-3">
             {pendingRequests.slice(0, 5).map(request => {
-              const patient = patients.find(p => p.id === request.patientId);
+              const patient = patients.find(p => p.id === request.patient_id);
               return (
                 <div key={request.id} className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center space-x-4">
@@ -190,7 +190,7 @@ const BedDashboard: React.FC = () => {
       {/* Bed Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBeds.map(bed => {
-          const patient = bed.patientId ? patients.find(p => p.id === bed.patientId) : null;
+          const patient = bed.patient_id ? patients.find(p => p.id === bed.patient_id) : null;
           
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -221,17 +221,17 @@ const BedDashboard: React.FC = () => {
                   <div className="space-y-1 text-sm text-gray-600">
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-3 h-3" />
-                      <span>Admitted: {bed.admissionDate ? new Date(bed.admissionDate).toLocaleDateString() : 'N/A'}</span>
+                      <span>Admitted: {bed.admission_date ? new Date(bed.admission_date).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     <div>
                       <span className="font-medium">Type:</span> {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')}
                     </div>
                     <div>
-                      <span className="font-medium">{t('common.status')}:</span> {patient.nutritionStatus.replace('_', ' ')}
+                      <span className="font-medium">{t('common.status')}:</span> {patient.nutrition_status.replace('_', ' ')}
                     </div>
                     <div>
-                      <span className="font-medium">Duration:</span> {bed.admissionDate ? 
-                        Math.ceil((new Date().getTime() - new Date(bed.admissionDate).getTime()) / (1000 * 60 * 60 * 24)) : 0
+                      <span className="font-medium">Duration:</span> {bed.admission_date ? 
+                        Math.ceil((new Date().getTime() - new Date(bed.admission_date).getTime()) / (1000 * 60 * 60 * 24)) : 0
                       } days
                     </div>
                   </div>

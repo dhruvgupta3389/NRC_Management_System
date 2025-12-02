@@ -56,7 +56,7 @@ const MedicalRecords: React.FC = () => {
       e.preventDefault();
       
       const newRecord: Omit<MedicalRecord, 'id'> = {
-        patientId: formData.patientId,
+        patientId: formData.patient_id,
         date: new Date().toISOString().split('T')[0],
         visitType: formData.visitType,
         healthWorkerId: formData.healthWorkerId,
@@ -64,7 +64,7 @@ const MedicalRecords: React.FC = () => {
           weight: parseFloat(formData.weight),
           height: parseFloat(formData.height),
           temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
-          bloodPressure: formData.bloodPressure || undefined,
+          bloodPressure: formData.blood_pressure || undefined,
           pulse: formData.pulse ? parseInt(formData.pulse) : undefined,
           respiratoryRate: formData.respiratoryRate ? parseInt(formData.respiratoryRate) : undefined,
           oxygenSaturation: formData.oxygenSaturation ? parseInt(formData.oxygenSaturation) : undefined,
@@ -93,7 +93,7 @@ const MedicalRecords: React.FC = () => {
           proteinLevel: formData.proteinLevel ? parseFloat(formData.proteinLevel) : undefined,
         },
         notes: formData.notes,
-        nextVisitDate: formData.nextVisitDate || undefined,
+        nextVisitDate: formData.next_visit_date || undefined,
         followUpRequired: formData.followUpRequired,
       };
 
@@ -171,11 +171,11 @@ const MedicalRecords: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.bloodPressure')}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.blood_pressure')}</label>
                   <input
                     type="text"
                     placeholder="120/80"
-                    value={formData.bloodPressure}
+                    value={formData.blood_pressure}
                     onChange={(e) => setFormData({...formData, bloodPressure: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -267,10 +267,10 @@ const MedicalRecords: React.FC = () => {
               </label>
               {formData.followUpRequired && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('medical.nextVisitDate')}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('medical.next_visit_date')}</label>
                   <input
                     type="date"
-                    value={formData.nextVisitDate}
+                    value={formData.next_visit_date}
                     onChange={(e) => setFormData({...formData, nextVisitDate: e.target.value})}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -336,10 +336,10 @@ const MedicalRecords: React.FC = () => {
                   <span className="text-sm">{t('medical.temp')}: {record.vitals.temperature}°F</span>
                 </div>
               )}
-              {record.vitals.bloodPressure && (
+              {record.vitals.blood_pressure && (
                 <div className="flex items-center space-x-2">
                   <Heart className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm">{t('medical.bp')}: {record.vitals.bloodPressure}</span>
+                  <span className="text-sm">{t('medical.bp')}: {record.vitals.blood_pressure}</span>
                 </div>
               )}
             </div>
@@ -451,7 +451,7 @@ const MedicalRecords: React.FC = () => {
             <option value="">{t('medical.choosePatient')}</option>
             {patients.map(patient => (
               <option key={patient.id} value={patient.id}>
-                {patient.name} - {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')} ({t('medical.registration')}: {patient.registrationNumber})
+                {patient.name} - {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')} ({t('medical.registration')}: {patient.registration_number})
               </option>
             ))}
           </select>
@@ -468,7 +468,7 @@ const MedicalRecords: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">{patient.name}</h3>
               <p className="text-sm text-gray-600">
                 {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')} • {t('common.age')}: {patient.age} • 
-                {t('medical.registration')}: {patient.registrationNumber}
+                {t('medical.registration')}: {patient.registration_number}
               </p>
             </div>
           </div>
@@ -482,8 +482,8 @@ const MedicalRecords: React.FC = () => {
               <p className="text-lg font-semibold text-green-600">{patient.height} cm</p>
             </div>
             <div>
-              <span className="text-sm font-medium text-gray-700">{t('patient.nutritionStatus')}:</span>
-              <p className="text-sm font-semibold text-orange-600">{t(`patient.${patient.nutritionStatus}`)}</p>
+              <span className="text-sm font-medium text-gray-700">{t('patient.nutrition_status')}:</span>
+              <p className="text-sm font-semibold text-orange-600">{t(`patient.${patient.nutrition_status}`)}</p>
             </div>
             <div>
               <span className="text-sm font-medium text-gray-700">{t('medical.totalRecords')}:</span>
@@ -559,8 +559,8 @@ const MedicalRecords: React.FC = () => {
                       ) : (
                         <span className="text-green-600">{t('ticket.notRequired')}</span>
                       )}
-                      {record.nextVisitDate && (
-                        <div className="text-xs mt-1">{t('visit.nextAttempt', { date: new Date(record.nextVisitDate).toLocaleDateString() })}</div>
+                      {record.next_visit_date && (
+                        <div className="text-xs mt-1">{t('visit.nextAttempt', { date: new Date(record.next_visit_date).toLocaleDateString() })}</div>
                       )}
                     </div>
                   </div>

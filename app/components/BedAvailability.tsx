@@ -72,7 +72,7 @@ const BedAvailability: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patientId}
+                value={formData.patient_id}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -217,7 +217,7 @@ const BedAvailability: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {beds.map(bed => {
-          const patient = bed.patientId ? patients.find(p => p.id === bed.patientId) : null;
+          const patient = bed.patient_id ? patients.find(p => p.id === bed.patient_id) : null;
           
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -248,13 +248,13 @@ const BedAvailability: React.FC = () => {
                   <div className="space-y-1 text-sm text-gray-600">
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-3 h-3" />
-                      <span>Admitted: {bed.admissionDate ? new Date(bed.admissionDate).toLocaleDateString() : 'N/A'}</span>
+                      <span>Admitted: {bed.admission_date ? new Date(bed.admission_date).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     <div>
                       <span className="font-medium">Type:</span> {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')}
                     </div>
                     <div>
-                      <span className="font-medium">{t('common.status')}:</span> {patient.nutritionStatus.replace('_', ' ')}
+                      <span className="font-medium">{t('common.status')}:</span> {patient.nutrition_status.replace('_', ' ')}
                     </div>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ const BedAvailability: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Bed Requests</h3>
         <div className="space-y-4">
           {bedRequests.slice(0, 5).map(request => {
-            const patient = patients.find(p => p.id === request.patientId);
+            const patient = patients.find(p => p.id === request.patient_id);
             return (
               <div key={request.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-4">

@@ -77,7 +77,7 @@ export const BedAvailability = () => {
                     'bg-yellow-100 text-yellow-800'
                   }`}>{bed.status}</span>
                 </td>
-                <td className="px-6 py-4">{bed.patientName || '-'}</td>
+                <td className="px-6 py-4">{bed.patient_name || '-'}</td>
               </tr>
             ))}
           </tbody>

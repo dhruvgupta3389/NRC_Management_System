@@ -50,9 +50,9 @@ const TreatmentTracker: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Treatment Cases</h3>
         <div className="space-y-4">
           {activeTrackers.map(tracker => {
-            const patient = patients.find(p => p.id === tracker.patientId);
+            const patient = patients.find(p => p.id === tracker.patient_id);
             const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
-            const duration = Math.ceil((new Date().getTime() - new Date(tracker.admissionDate).getTime()) / (1000 * 60 * 60 * 24));
+            const duration = Math.ceil((new Date().getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24));
 
             return (
               <div key={tracker.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">

@@ -26,8 +26,8 @@ const PostHospitalizationTracker: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       addTreatmentTracker({
-        patientId: formData.patientId,
-        hospitalId: formData.hospitalId,
+        patientId: formData.patient_id,
+        hospitalId: formData.hospital_id,
         admissionDate: new Date().toISOString().split('T')[0],
         treatmentPlan: formData.treatmentPlan.split(',').map(t => t.trim()).filter(t => t),
         medicineSchedule: [],
@@ -54,7 +54,7 @@ const PostHospitalizationTracker: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patientId}
+                value={formData.patient_id}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -144,7 +144,7 @@ const PostHospitalizationTracker: React.FC = () => {
   };
 
   const TrackerDetailsModal = ({ tracker }: { tracker: TreatmentTracker }) => {
-    const patient = patients.find(p => p.id === tracker.patientId);
+    const patient = patients.find(p => p.id === tracker.patient_id);
     
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -171,7 +171,7 @@ const PostHospitalizationTracker: React.FC = () => {
                 <div><span className="font-medium">{t('common.name')}:</span> {patient?.name}</div>
                 <div><span className="font-medium">{t('common.age')}:</span> {patient?.age} years</div>
                 <div><span className="font-medium">Type:</span> {patient?.type === 'child' ? t('patient.child') : t('patient.pregnant')}</div>
-                <div><span className="font-medium">Admission:</span> {new Date(tracker.admissionDate).toLocaleDateString()}</div>
+                <div><span className="font-medium">Admission:</span> {new Date(tracker.admission_date).toLocaleDateString()}</div>
               </div>
             </div>
 
@@ -317,7 +317,7 @@ const PostHospitalizationTracker: React.FC = () => {
           </div>
         ) : (
           treatmentTrackers.map(tracker => {
-            const patient = patients.find(p => p.id === tracker.patientId);
+            const patient = patients.find(p => p.id === tracker.patient_id);
             const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
             
             return (
@@ -357,13 +357,13 @@ const PostHospitalizationTracker: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Treatment Progress</h4>
                     <div className="space-y-1 text-sm text-gray-600">
-                      <div>Admission: {new Date(tracker.admissionDate).toLocaleDateString()}</div>
+                      <div>Admission: {new Date(tracker.admission_date).toLocaleDateString()}</div>
                       {tracker.dischargeDate && (
                         <div>Discharge: {new Date(tracker.dischargeDate).toLocaleDateString()}</div>
                       )}
                       <div>Duration: {tracker.dischargeDate ? 
-                        Math.ceil((new Date(tracker.dischargeDate).getTime() - new Date(tracker.admissionDate).getTime()) / (1000 * 60 * 60 * 24)) :
-                        Math.ceil((new Date().getTime() - new Date(tracker.admissionDate).getTime()) / (1000 * 60 * 60 * 24))
+                        Math.ceil((new Date(tracker.dischargeDate).getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24)) :
+                        Math.ceil((new Date().getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24))
                       } days</div>
                     </div>
                   </div>

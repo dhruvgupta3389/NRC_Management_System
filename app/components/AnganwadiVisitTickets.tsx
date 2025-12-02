@@ -64,7 +64,7 @@ const AnganwadiVisitTickets: React.FC = () => {
     });
 
     const selectedAnganwadi = anganwadis.find(a => a.id === formData.anganwadiId);
-    const availableWorkers = workers.filter(w => w.anganwadiId === formData.anganwadiId && w.isActive);
+    const availableWorkers = workers.filter(w => w.anganwadiId === formData.anganwadiId && w.is_active);
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();

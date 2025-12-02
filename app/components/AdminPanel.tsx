@@ -233,7 +233,7 @@ const AdminPanel: React.FC = () => {
                   <label className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={formData.isActive}
+                      checked={formData.is_active}
                       onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
                       className="mr-2 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     />
