@@ -85,7 +85,7 @@ const AdminPanel: React.FC = () => {
       role: user?.role || 'anganwadi_worker' as 'anganwadi_worker' | 'supervisor' | 'hospital' | 'admin',
       contactNumber: user?.contact_number || '',
       email: user?.email || '',
-      isActive: user?.is_active ?? true
+      is_active: user?.is_active ?? true
     });
     const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
