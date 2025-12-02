@@ -438,6 +438,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  // Visit Operations
+  const loadVisits = async (patientId?: string) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (patientId) params.append('patientId', patientId);
+
+      const response = await fetch(`/api/visits?${params.toString()}`);
+      if (!response.ok) throw new Error('Failed to load visits');
+
+      const data = await response.json();
+      setVisits(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading visits';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Load current user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
