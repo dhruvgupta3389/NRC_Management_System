@@ -116,6 +116,10 @@ interface AppContextType {
   markNotificationRead: (id: string) => Promise<void>;
   addNotification: (notification: Omit<Notification, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
 
+  // Visits
+  visits: Visit[];
+  loadVisits: (patientId?: string) => Promise<void>;
+
   loading: boolean;
   error: string | null;
 }
