@@ -58,7 +58,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password using bcryptjs
-    const passwordMatch = await bcrypt.compare(password, users.password_hash);
+    let passwordMatch = false;
+    try {
+      passwordMatch = await bcrypt.compare(password, users.password_hash);
+    } catch (bcryptError) {
+      console.error('❌ Bcrypt error:', bcryptError);
+      return NextResponse.json(
+        { error: 'Authentication error' },
+        { status: 500 }
+      );
+    }
 
     if (!passwordMatch) {
       console.log('Password mismatch for user:', username);
