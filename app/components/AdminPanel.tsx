@@ -78,12 +78,12 @@ const AdminPanel: React.FC = () => {
     };
 
     const [formData, setFormData] = useState({
-      employeeId: user?.employee_id || generateEmployeeId(),
+      employee_id: user?.employee_id || generateEmployeeId(),
       username: user?.username || '',
       password: '',
       name: user?.name || '',
       role: user?.role || 'anganwadi_worker' as 'anganwadi_worker' | 'supervisor' | 'hospital' | 'admin',
-      contactNumber: user?.contact_number || '',
+      contact_number: user?.contact_number || '',
       email: user?.email || '',
       is_active: user?.is_active ?? true
     });
