@@ -44,15 +44,16 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         }),
       });
 
-      // Try to parse response as JSON
+      // Read response as text first to avoid stream read issues
       let data: any = {};
-      const contentType = response.headers.get('content-type');
+      const responseText = await response.text();
 
-      if (contentType && contentType.includes('application/json')) {
+      if (responseText) {
         try {
-          data = await response.json();
+          data = JSON.parse(responseText);
         } catch (parseError) {
-          console.error('❌ Failed to parse JSON response:', parseError);
+          console.error('❌ Failed to parse response text:', parseError);
+          console.error('Response text:', responseText);
           data = { error: 'Invalid server response' };
         }
       }
@@ -60,7 +61,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       // Check if login was successful
       if (!response.ok) {
         const errorMessage = data?.error || 'Invalid credentials. Please try again.';
-        console.error('❌ Login failed:', errorMessage);
+        console.error('❌ Login failed:', errorMessage, 'Status:', response.status);
         alert(errorMessage);
         setIsLoading(false);
         return;
@@ -79,6 +80,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     } catch (error) {
       console.error('❌ Login error:', error);
       alert('Connection error. Please check if the server is running.');
+      setIsLoading(false);
+    } finally {
       setIsLoading(false);
     }
   };
