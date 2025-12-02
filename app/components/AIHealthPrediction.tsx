@@ -134,7 +134,7 @@ const AIHealthPrediction: React.FC = () => {
                     <p className="text-sm text-gray-600">Age {patient.age} • {patient.type}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-red-800">Risk: {patient.riskScore}%</span>
+                <span className="text-sm font-bold text-red-800">Risk: {patient.risk_score}%</span>
               </div>
             </div>
           ))}
