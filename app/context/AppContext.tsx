@@ -373,14 +373,52 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updatePatient = async (id: string, updates: Partial<Patient>) => {
     try {
       setLoading(true);
+      const updatePayload: Record<string, any> = {};
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+
+        const camelCaseMap: Record<string, string> = {
+          pregnancy_week: 'pregnancyWeek',
+          contact_number: 'contactNumber',
+          emergency_contact: 'emergencyContact',
+          blood_pressure: 'bloodPressure',
+          nutrition_status: 'nutritionStatus',
+          medical_history: 'medicalHistory',
+          risk_score: 'riskScore',
+          nutritional_deficiency: 'nutritionalDeficiency',
+          registered_by: 'registeredBy',
+          aadhaar_number: 'aadhaarNumber',
+          last_visit_date: 'lastVisitDate',
+          next_visit_date: 'nextVisitDate'
+        };
+
+        const camelKey = camelCaseMap[key] || key;
+        updatePayload[camelKey] = value;
+      });
+
       const response = await fetch(`/api/patients/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updatePayload)
       });
 
-      if (!response.ok) throw new Error('Failed to update patient');
-      const data = await response.json();
+      let errorData: any = {};
+      const responseText = await response.text();
+
+      if (responseText) {
+        try {
+          errorData = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('Failed to parse response:', parseError);
+        }
+      }
+
+      if (!response.ok) {
+        throw new Error(errorData.error || 'Failed to update patient');
+      }
+
+      const data = errorData;
       setPatients(patients.map(p => p.id === id ? data : p));
       setError(null);
     } catch (err) {
