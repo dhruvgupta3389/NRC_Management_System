@@ -298,13 +298,23 @@ const AdminPanel: React.FC = () => {
 
     try {
       console.log('🗑️ Deactivating user:', userId);
-      
+
       const response = await fetch(`/api/auth/users/${userId}`, {
         method: 'DELETE',
       });
 
+      const responseText = await response.text();
+
       if (!response.ok) {
-        throw new Error('Failed to deactivate user');
+        let errorData: any = {};
+        if (responseText) {
+          try {
+            errorData = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse error response:', parseError);
+          }
+        }
+        throw new Error(errorData.error || 'Failed to deactivate user');
       }
 
       console.log('✅ User deactivated successfully');
