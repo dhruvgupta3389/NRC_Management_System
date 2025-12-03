@@ -355,22 +355,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         })
       });
 
-      let errorData: any = {};
-      const responseText = await response.text();
-
-      if (responseText) {
-        try {
-          errorData = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error('Failed to parse response:', parseError);
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+            data = { error: responseText };
+          }
         }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+        data = { error: 'Failed to read server response' };
       }
 
       if (!response.ok) {
-        throw new Error(errorData.error || 'Failed to add patient');
+        throw new Error(data.error || 'Failed to add patient');
       }
 
-      const data = errorData;
       setPatients([...patients, data]);
       setError(null);
       return data;
