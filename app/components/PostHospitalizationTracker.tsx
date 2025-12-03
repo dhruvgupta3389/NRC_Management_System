@@ -9,8 +9,8 @@ const PostHospitalizationTracker: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedTracker, setSelectedTracker] = useState<TreatmentTracker | null>(null);
 
-  const dischargedPatients = treatmentTrackers.filter(tracker => tracker.dischargeDate);
-  const activeTrackers = treatmentTrackers.filter(tracker => !tracker.dischargeDate);
+  const dischargedPatients = treatmentTrackers.filter(tracker => tracker.discharge_date);
+  const activeTrackers = treatmentTrackers.filter(tracker => !tracker.discharge_date);
 
   const AddTrackerForm = () => {
     const [formData, setFormData] = useState({
@@ -335,7 +335,7 @@ const PostHospitalizationTracker: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    {tracker.dischargeDate ? (
+                    {tracker.discharge_date ? (
                       <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                         Discharged
                       </span>
@@ -358,11 +358,11 @@ const PostHospitalizationTracker: React.FC = () => {
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Treatment Progress</h4>
                     <div className="space-y-1 text-sm text-gray-600">
                       <div>Admission: {new Date(tracker.admission_date).toLocaleDateString()}</div>
-                      {tracker.dischargeDate && (
-                        <div>Discharge: {new Date(tracker.dischargeDate).toLocaleDateString()}</div>
+                      {tracker.discharge_date && (
+                        <div>Discharge: {new Date(tracker.discharge_date).toLocaleDateString()}</div>
                       )}
-                      <div>Duration: {tracker.dischargeDate ? 
-                        Math.ceil((new Date(tracker.dischargeDate).getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24)) :
+                      <div>Duration: {tracker.discharge_date ? 
+                        Math.ceil((new Date(tracker.discharge_date).getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24)) :
                         Math.ceil((new Date().getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24))
                       } days</div>
                     </div>
