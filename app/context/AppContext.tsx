@@ -156,6 +156,12 @@ interface AppContextType {
   addBedRequest: (request: Omit<BedRequest, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateBedRequest: (id: string, updates: Partial<BedRequest>) => Promise<void>;
 
+  // Treatment Trackers
+  treatmentTrackers: TreatmentTracker[];
+  loadTreatmentTrackers: (patientId?: string) => Promise<void>;
+  addTreatmentTracker: (tracker: Omit<TreatmentTracker, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateTreatmentTracker: (id: string, updates: Partial<TreatmentTracker>) => Promise<void>;
+
   loading: boolean;
   error: string | null;
 }
