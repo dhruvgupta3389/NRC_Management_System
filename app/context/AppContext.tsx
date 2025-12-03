@@ -296,9 +296,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (registeredBy) params.append('registeredBy', registeredBy);
 
       const response = await fetch(`/api/patients?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to load patients');
 
-      const data = await response.json();
+      let data: any = {};
+      const responseText = await response.text();
+
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('Failed to parse response:', parseError);
+        }
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load patients');
+      }
+
       setPatients(data.data || []);
       setError(null);
     } catch (err) {
