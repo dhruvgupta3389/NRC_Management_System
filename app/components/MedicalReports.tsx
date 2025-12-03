@@ -5,7 +5,7 @@ import { FileText, Download, Calendar, User } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const MedicalReports: React.FC = () => {
-  const { medicalRecords, patients, t } = useApp();
+  const { medicalRecords = [], patients, t } = useApp();
 
   return (
     <div className="space-y-6">

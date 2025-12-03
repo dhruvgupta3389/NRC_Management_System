@@ -29,13 +29,24 @@ const AdminPanel: React.FC = () => {
     try {
       setLoading(true);
       console.log('🔄 Loading users from database...');
-      
+
       const response = await fetch('/api/auth/users');
+
+      let usersData: User[] = [];
+      const responseText = await response.text();
+
+      if (responseText) {
+        try {
+          usersData = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('Failed to parse users response:', parseError);
+        }
+      }
+
       if (!response.ok) {
         throw new Error(`Failed to fetch users: ${response.statusText}`);
       }
-      
-      const usersData = await response.json();
+
       setUsers(usersData);
       console.log('✅ Users loaded successfully:', usersData.length);
     } catch (err) {
@@ -113,8 +124,18 @@ const AdminPanel: React.FC = () => {
           body: JSON.stringify(payload),
         });
 
+        let errorData: any = {};
+        const responseText = await response.text();
+
+        if (responseText) {
+          try {
+            errorData = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+
         if (!response.ok) {
-          const errorData = await response.json();
           throw new Error(errorData.error || `Failed to ${user ? 'update' : 'create'} user`);
         }
 
@@ -277,13 +298,23 @@ const AdminPanel: React.FC = () => {
 
     try {
       console.log('🗑️ Deactivating user:', userId);
-      
+
       const response = await fetch(`/api/auth/users/${userId}`, {
         method: 'DELETE',
       });
 
+      const responseText = await response.text();
+
       if (!response.ok) {
-        throw new Error('Failed to deactivate user');
+        let errorData: any = {};
+        if (responseText) {
+          try {
+            errorData = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse error response:', parseError);
+          }
+        }
+        throw new Error(errorData.error || 'Failed to deactivate user');
       }
 
       console.log('✅ User deactivated successfully');

@@ -296,9 +296,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (registeredBy) params.append('registeredBy', registeredBy);
 
       const response = await fetch(`/api/patients?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to load patients');
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load patients');
+      }
+
       setPatients(data.data || []);
       setError(null);
     } catch (err) {
@@ -320,30 +336,48 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           name: patient.name,
           age: patient.age,
           type: patient.type,
-          pregnancy_week: patient.pregnancy_week,
-          contact_number: patient.contact_number,
-          emergency_contact: patient.emergency_contact,
+          pregnancyWeek: patient.pregnancy_week,
+          contactNumber: patient.contact_number,
+          emergencyContact: patient.emergency_contact,
           address: patient.address,
           weight: patient.weight,
           height: patient.height,
-          blood_pressure: patient.blood_pressure,
+          bloodPressure: patient.blood_pressure,
           temperature: patient.temperature,
           hemoglobin: patient.hemoglobin,
-          nutrition_status: patient.nutrition_status,
-          medical_history: patient.medical_history || [],
+          nutritionStatus: patient.nutrition_status,
+          medicalHistory: patient.medical_history || [],
           symptoms: patient.symptoms || [],
           remarks: patient.remarks,
-          risk_score: patient.risk_score,
-          nutritional_deficiency: patient.nutritional_deficiency || [],
-          registered_by: currentUser?.id,
-          aadhaar_number: patient.aadhaar_number,
-          last_visit_date: patient.last_visit_date,
-          next_visit_date: patient.next_visit_date
+          riskScore: patient.risk_score,
+          nutritionalDeficiency: patient.nutritional_deficiency || [],
+          registeredBy: currentUser?.id,
+          aadhaarNumber: patient.aadhaar_number,
+          lastVisitDate: patient.last_visit_date,
+          nextVisitDate: patient.next_visit_date
         })
       });
 
-      if (!response.ok) throw new Error('Failed to add patient');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+            data = { error: responseText };
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+        data = { error: 'Failed to read server response' };
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add patient');
+      }
+
       setPatients([...patients, data]);
       setError(null);
       return data;
@@ -359,14 +393,54 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updatePatient = async (id: string, updates: Partial<Patient>) => {
     try {
       setLoading(true);
+      const updatePayload: Record<string, any> = {};
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+
+        const camelCaseMap: Record<string, string> = {
+          pregnancy_week: 'pregnancyWeek',
+          contact_number: 'contactNumber',
+          emergency_contact: 'emergencyContact',
+          blood_pressure: 'bloodPressure',
+          nutrition_status: 'nutritionStatus',
+          medical_history: 'medicalHistory',
+          risk_score: 'riskScore',
+          nutritional_deficiency: 'nutritionalDeficiency',
+          registered_by: 'registeredBy',
+          aadhaar_number: 'aadhaarNumber',
+          last_visit_date: 'lastVisitDate',
+          next_visit_date: 'nextVisitDate'
+        };
+
+        const camelKey = camelCaseMap[key] || key;
+        updatePayload[camelKey] = value;
+      });
+
       const response = await fetch(`/api/patients/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updatePayload)
       });
 
-      if (!response.ok) throw new Error('Failed to update patient');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update patient');
+      }
+
       setPatients(patients.map(p => p.id === id ? data : p));
       setError(null);
     } catch (err) {
@@ -387,9 +461,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (status) params.append('status', status);
 
       const response = await fetch(`/api/beds?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to load beds');
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load beds');
+      }
+
       setBeds(data.data || []);
       setError(null);
     } catch (err) {
@@ -410,8 +500,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         body: JSON.stringify(updates)
       });
 
-      if (!response.ok) throw new Error('Failed to update bed');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update bed');
+      }
+
       setBeds(beds.map(b => b.id === id ? data : b));
       setError(null);
     } catch (err) {
@@ -431,9 +537,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (userId) params.append('userId', userId);
 
       const response = await fetch(`/api/notifications?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to load notifications');
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load notifications');
+      }
+
       setNotifications(data.data || []);
       setError(null);
     } catch (err) {
@@ -452,8 +574,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         headers: { 'Content-Type': 'application/json' }
       });
 
-      if (!response.ok) throw new Error('Failed to mark notification as read');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to mark notification as read');
+      }
+
       setNotifications(notifications.map(n => n.id === id ? data : n));
       setError(null);
     } catch (err) {
@@ -471,8 +609,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         body: JSON.stringify(notification)
       });
 
-      if (!response.ok) throw new Error('Failed to add notification');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add notification');
+      }
+
       setNotifications([...notifications, data]);
       setError(null);
     } catch (err) {
@@ -490,9 +644,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (patientId) params.append('patientId', patientId);
 
       const response = await fetch(`/api/visits?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to load visits');
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load visits');
+      }
+
       setVisits(data.data || []);
       setError(null);
     } catch (err) {
@@ -509,9 +679,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       setLoading(true);
       const response = await fetch('/api/bed-requests');
-      if (!response.ok) throw new Error('Failed to load bed requests');
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load bed requests');
+      }
+
       setBedRequests(data.data || []);
       setError(null);
     } catch (err) {
@@ -531,8 +717,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         body: JSON.stringify(request)
       });
 
-      if (!response.ok) throw new Error('Failed to add bed request');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add bed request');
+      }
+
       setBedRequests([...bedRequests, data]);
       setError(null);
     } catch (err) {
@@ -550,8 +752,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         body: JSON.stringify(updates)
       });
 
-      if (!response.ok) throw new Error('Failed to update bed request');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update bed request');
+      }
+
       setBedRequests(bedRequests.map(req => req.id === id ? data : req));
       setError(null);
     } catch (err) {
@@ -569,9 +787,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (patientId) params.append('patientId', patientId);
 
       const response = await fetch(`/api/treatment-trackers?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to load treatment trackers');
 
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load treatment trackers');
+      }
+
       setTreatmentTrackers(data.data || []);
       setError(null);
     } catch (err) {
@@ -591,8 +825,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         body: JSON.stringify(tracker)
       });
 
-      if (!response.ok) throw new Error('Failed to add treatment tracker');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add treatment tracker');
+      }
+
       setTreatmentTrackers([...treatmentTrackers, data]);
       setError(null);
     } catch (err) {
@@ -610,8 +860,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         body: JSON.stringify(updates)
       });
 
-      if (!response.ok) throw new Error('Failed to update treatment tracker');
-      const data = await response.json();
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update treatment tracker');
+      }
+
       setTreatmentTrackers(treatmentTrackers.map(tracker => tracker.id === id ? data : tracker));
       setError(null);
     } catch (err) {
