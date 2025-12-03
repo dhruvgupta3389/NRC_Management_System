@@ -142,7 +142,7 @@ const Notifications: React.FC = () => {
             <div>
               <p className="text-sm text-green-600">Action Required</p>
               <p className="text-2xl font-bold text-green-800">
-                {notifications.filter(n => n.actionRequired && !n.read).length}
+                {notifications.filter(n => n.action_required && !n.read).length}
               </p>
             </div>
           </div>
@@ -177,7 +177,7 @@ const Notifications: React.FC = () => {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(notification.type)}`}>
                         {t(`notification.${notification.type}`)}
                       </span>
-                      {notification.actionRequired && (
+                      {notification.action_required && (
                         <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
                           Action Required
                         </span>

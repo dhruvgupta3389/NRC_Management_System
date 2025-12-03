@@ -51,7 +51,7 @@ const BedRequests: React.FC = () => {
     const request = bedRequests.find(r => r.id === requestId);
     if (!request) return;
 
-    const patient = patients.find(p => p.id === request.patientId);
+    const patient = patients.find(p => p.id === request.patient_id);
     const wardType = patient?.type === 'child' ? 'Pediatric' : 'Maternity';
     const availableBed = beds.find(bed => bed.status === 'available' && bed.ward === wardType);
 
@@ -65,7 +65,7 @@ const BedRequests: React.FC = () => {
 
       updateBed(availableBed.id, {
         status: 'occupied',
-        patientId: request.patientId,
+        patientId: request.patient_id,
         admissionDate: new Date().toISOString().split('T')[0],
       });
     }
@@ -93,7 +93,7 @@ const BedRequests: React.FC = () => {
   };
 
   const RequestDetailsModal = ({ request }: { request: BedRequest }) => {
-    const patient = patients.find(p => p.id === request.patientId);
+    const patient = patients.find(p => p.id === request.patient_id);
     const [reviewComments, setReviewComments] = useState('');
     const [showHospitalForm, setShowHospitalForm] = useState(false);
     const [hospitalData, setHospitalData] = useState({
@@ -163,7 +163,7 @@ const BedRequests: React.FC = () => {
                 <div><span className="font-medium">{t('common.name')}:</span> {patient?.name}</div>
                 <div><span className="font-medium">{t('common.age')}:</span> {patient?.age} years</div>
                 <div><span className="font-medium">Type:</span> {patient?.type === 'child' ? t('patient.child') : t('patient.pregnant')}</div>
-                <div><span className="font-medium">Nutrition Status:</span> {patient?.nutritionStatus}</div>
+                <div><span className="font-medium">Nutrition Status:</span> {patient?.nutrition_status}</div>
                 <div><span className="font-medium">{t('common.contact')}:</span> {patient?.contactNumber}</div>
               </div>
             </div>
@@ -466,7 +466,7 @@ const BedRequests: React.FC = () => {
           </div>
         ) : (
           filteredRequests.map(request => {
-            const patient = patients.find(p => p.id === request.patientId);
+            const patient = patients.find(p => p.id === request.patient_id);
             
             return (
               <div key={request.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

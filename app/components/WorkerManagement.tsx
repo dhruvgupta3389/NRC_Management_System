@@ -14,7 +14,7 @@ const WorkerManagement: React.FC = () => {
   const filteredWorkers = workers.filter(worker => {
     const matchesRole = filterRole === 'all' || worker.role === filterRole;
     const matchesAnganwadi = filterAnganwadi === 'all' || worker.anganwadiId === filterAnganwadi;
-    return matchesRole && matchesAnganwadi && worker.isActive;
+    return matchesRole && matchesAnganwadi && worker.is_active;
   });
 
   const getRoleColor = (role: string) => {
@@ -86,13 +86,13 @@ const WorkerManagement: React.FC = () => {
                     <span>Hours: {worker.workingHours.start} - {worker.workingHours.end}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {worker.isActive ? (
+                    {worker.is_active ? (
                       <CheckCircle className="w-4 h-4 text-green-600" />
                     ) : (
                       <XCircle className="w-4 h-4 text-red-600" />
                     )}
-                    <span className={worker.isActive ? 'text-green-600' : 'text-red-600'}>
-                      {worker.isActive ? 'Active' : 'Inactive'}
+                    <span className={worker.is_active ? 'text-green-600' : 'text-red-600'}>
+                      {worker.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </div>
                 </div>
@@ -455,7 +455,7 @@ const WorkerManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-purple-600">Heads</p>
                 <p className="text-2xl font-bold text-purple-800">
-                  {workers.filter(w => w.role === 'head' && w.isActive).length}
+                  {workers.filter(w => w.role === 'head' && w.is_active).length}
                 </p>
               </div>
             </div>
@@ -466,7 +466,7 @@ const WorkerManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-blue-600">Supervisors</p>
                 <p className="text-2xl font-bold text-blue-800">
-                  {workers.filter(w => w.role === 'supervisor' && w.isActive).length}
+                  {workers.filter(w => w.role === 'supervisor' && w.is_active).length}
                 </p>
               </div>
             </div>
@@ -477,7 +477,7 @@ const WorkerManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-green-600">Helpers</p>
                 <p className="text-2xl font-bold text-green-800">
-                  {workers.filter(w => w.role === 'helper' && w.isActive).length}
+                  {workers.filter(w => w.role === 'helper' && w.is_active).length}
                 </p>
               </div>
             </div>
@@ -488,7 +488,7 @@ const WorkerManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-orange-600">ASHA Workers</p>
                 <p className="text-2xl font-bold text-orange-800">
-                  {workers.filter(w => w.role === 'asha' && w.isActive).length}
+                  {workers.filter(w => w.role === 'asha' && w.is_active).length}
                 </p>
               </div>
             </div>

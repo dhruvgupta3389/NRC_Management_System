@@ -5,11 +5,11 @@ import { Zap, AlertTriangle, CheckCircle, TrendingUp, User } from 'lucide-react'
 import { useApp } from '../context/AppContext';
 
 const AIHealthPrediction: React.FC = () => {
-  const { patients, medicalRecords, t } = useApp();
+  const { patients, t } = useApp();
   const [selectedPatient, setSelectedPatient] = useState<string>('');
 
-  const riskPatients = patients.filter(p => p.riskScore && p.riskScore >= 70);
-  const selectedPatientData = selectedPatient ? patients.find(p => p.id === selectedPatient) : null;
+  const riskPatients = patients?.filter(p => p.risk_score && p.risk_score >= 70) || [];
+  const selectedPatientData = selectedPatient ? patients?.find(p => p.id === selectedPatient) : null;
 
   return (
     <div className="space-y-6">
@@ -32,7 +32,7 @@ const AIHealthPrediction: React.FC = () => {
               <div>
                 <p className="text-sm text-yellow-600">Moderate Risk</p>
                 <p className="text-2xl font-bold text-yellow-800">
-                  {patients.filter(p => p.riskScore && p.riskScore >= 50 && p.riskScore < 70).length}
+                  {patients?.filter(p => p.risk_score && p.risk_score >= 50 && p.risk_score < 70)?.length || 0}
                 </p>
               </div>
             </div>
@@ -43,7 +43,7 @@ const AIHealthPrediction: React.FC = () => {
               <div>
                 <p className="text-sm text-green-600">Low Risk</p>
                 <p className="text-2xl font-bold text-green-800">
-                  {patients.filter(p => !p.riskScore || p.riskScore < 50).length}
+                  {patients?.filter(p => !p.risk_score || p.risk_score < 50)?.length || 0}
                 </p>
               </div>
             </div>
@@ -60,7 +60,7 @@ const AIHealthPrediction: React.FC = () => {
             <option value="">Choose a patient...</option>
             {patients.map(patient => (
               <option key={patient.id} value={patient.id}>
-                {patient.name} - Risk: {patient.riskScore || 0}%
+                {patient.name} - Risk: {patient.risk_score || 0}%
               </option>
             ))}
           </select>
@@ -76,17 +76,17 @@ const AIHealthPrediction: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                   <span className="text-sm text-gray-700">Nutrition Status</span>
-                  <span className="text-sm font-medium text-red-600">{selectedPatientData.nutritionStatus}</span>
+                  <span className="text-sm font-medium text-red-600">{selectedPatientData.nutrition_status}</span>
                 </div>
                 <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                   <span className="text-sm text-gray-700">Overall Risk Score</span>
-                  <span className="text-sm font-medium text-red-600">{selectedPatientData.riskScore || 0}%</span>
+                  <span className="text-sm font-medium text-red-600">{selectedPatientData.risk_score || 0}%</span>
                 </div>
-                {selectedPatientData.nutritionalDeficiency && selectedPatientData.nutritionalDeficiency.length > 0 && (
+                {selectedPatientData.nutritional_deficiency && selectedPatientData.nutritional_deficiency.length > 0 && (
                   <div className="p-3 bg-red-50 rounded">
                     <p className="text-xs font-medium text-red-700">Deficiencies:</p>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {selectedPatientData.nutritionalDeficiency.map((def: string, idx: number) => (
+                      {selectedPatientData.nutritional_deficiency.map((def: string, idx: number) => (
                         <span key={idx} className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
                           {def}
                         </span>
@@ -134,7 +134,7 @@ const AIHealthPrediction: React.FC = () => {
                     <p className="text-sm text-gray-600">Age {patient.age} • {patient.type}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-red-800">Risk: {patient.riskScore}%</span>
+                <span className="text-sm font-bold text-red-800">Risk: {patient.risk_score}%</span>
               </div>
             </div>
           ))}

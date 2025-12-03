@@ -75,6 +75,47 @@ export interface Notification {
   updated_at: string;
 }
 
+export interface Visit {
+  id: string;
+  patient_id: string;
+  scheduled_date: string;
+  visit_type: string;
+  status: 'pending' | 'completed' | 'cancelled';
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BedRequest {
+  id: string;
+  patient_id: string;
+  urgency_level: 'low' | 'medium' | 'high' | 'critical';
+  medical_justification: string;
+  current_condition: string;
+  estimated_stay_duration: number;
+  special_requirements?: string;
+  requested_by: string;
+  request_date: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TreatmentTracker {
+  id: string;
+  patient_id: string;
+  hospital_id: string;
+  admission_date: string;
+  discharge_date?: string;
+  treatment_plan: string[];
+  medicine_schedule: Array<{ medicine: string; dosage: string; frequency: string }>;
+  doctor_remarks: string[];
+  daily_progress: Array<{ date: string; weight?: number; appetite?: string; notes?: string }>;
+  lab_reports: Array<{ date: string; type: string; results: string }>;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AppContextType {
   // Language & Localization
   language: 'en' | 'hi';
@@ -104,6 +145,22 @@ interface AppContextType {
   loadNotifications: (userId?: string) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
   addNotification: (notification: Omit<Notification, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+
+  // Visits
+  visits: Visit[];
+  loadVisits: (patientId?: string) => Promise<void>;
+
+  // Bed Requests
+  bedRequests: BedRequest[];
+  loadBedRequests: () => Promise<void>;
+  addBedRequest: (request: Omit<BedRequest, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateBedRequest: (id: string, updates: Partial<BedRequest>) => Promise<void>;
+
+  // Treatment Trackers
+  treatmentTrackers: TreatmentTracker[];
+  loadTreatmentTrackers: (patientId?: string) => Promise<void>;
+  addTreatmentTracker: (tracker: Omit<TreatmentTracker, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateTreatmentTracker: (id: string, updates: Partial<TreatmentTracker>) => Promise<void>;
 
   loading: boolean;
   error: string | null;
@@ -167,6 +224,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [patients, setPatients] = useState<Patient[]>([]);
   const [beds, setBeds] = useState<Bed[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [bedRequests, setBedRequests] = useState<BedRequest[]>([]);
+  const [treatmentTrackers, setTreatmentTrackers] = useState<TreatmentTracker[]>([]);
 
   // Translation function
   const t = (key: string, params?: Record<string, string | number>): string => {
@@ -422,6 +482,145 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  // Visit Operations
+  const loadVisits = async (patientId?: string) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (patientId) params.append('patientId', patientId);
+
+      const response = await fetch(`/api/visits?${params.toString()}`);
+      if (!response.ok) throw new Error('Failed to load visits');
+
+      const data = await response.json();
+      setVisits(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading visits';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Bed Request Operations
+  const loadBedRequests = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/bed-requests');
+      if (!response.ok) throw new Error('Failed to load bed requests');
+
+      const data = await response.json();
+      setBedRequests(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading bed requests';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addBedRequest = async (request: Omit<BedRequest, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/bed-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+      });
+
+      if (!response.ok) throw new Error('Failed to add bed request');
+      const data = await response.json();
+      setBedRequests([...bedRequests, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding bed request';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const updateBedRequest = async (id: string, updates: Partial<BedRequest>) => {
+    try {
+      const response = await fetch(`/api/bed-requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) throw new Error('Failed to update bed request');
+      const data = await response.json();
+      setBedRequests(bedRequests.map(req => req.id === id ? data : req));
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error updating bed request';
+      setError(message);
+      throw err;
+    }
+  };
+
+  // Treatment Tracker Operations
+  const loadTreatmentTrackers = async (patientId?: string) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (patientId) params.append('patientId', patientId);
+
+      const response = await fetch(`/api/treatment-trackers?${params.toString()}`);
+      if (!response.ok) throw new Error('Failed to load treatment trackers');
+
+      const data = await response.json();
+      setTreatmentTrackers(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading treatment trackers';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addTreatmentTracker = async (tracker: Omit<TreatmentTracker, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/treatment-trackers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tracker)
+      });
+
+      if (!response.ok) throw new Error('Failed to add treatment tracker');
+      const data = await response.json();
+      setTreatmentTrackers([...treatmentTrackers, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding treatment tracker';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const updateTreatmentTracker = async (id: string, updates: Partial<TreatmentTracker>) => {
+    try {
+      const response = await fetch(`/api/treatment-trackers/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) throw new Error('Failed to update treatment tracker');
+      const data = await response.json();
+      setTreatmentTrackers(treatmentTrackers.map(tracker => tracker.id === id ? data : tracker));
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error updating treatment tracker';
+      setError(message);
+      throw err;
+    }
+  };
+
   // Load current user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
@@ -463,6 +662,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadNotifications,
     markNotificationRead,
     addNotification,
+    visits,
+    loadVisits,
+    bedRequests,
+    loadBedRequests,
+    addBedRequest,
+    updateBedRequest,
+    treatmentTrackers,
+    loadTreatmentTrackers,
+    addTreatmentTracker,
+    updateTreatmentTracker,
     loading,
     error
   };

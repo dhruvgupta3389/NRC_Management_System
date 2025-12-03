@@ -33,7 +33,7 @@ const PatientRegistration: React.FC = () => {
 
     const newPatient: Omit<Patient, 'id' | 'registrationNumber' | 'admissionDate'> = {
       name: formData.name,
-      aadhaarNumber: formData.aadhaarNumber,
+      aadhaarNumber: formData.aadhaar_number,
       age: parseInt(formData.age),
       type: formData.type,
       pregnancyWeek: formData.pregnancyWeek ? parseInt(formData.pregnancyWeek) : undefined,
@@ -41,21 +41,21 @@ const PatientRegistration: React.FC = () => {
       address: formData.address,
       weight: parseFloat(formData.weight),
       height: parseFloat(formData.height),
-      bloodPressure: formData.bloodPressure || undefined,
+      bloodPressure: formData.blood_pressure || undefined,
       temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
       symptoms: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
       documents: formData.documents.split(',').map(d => d.trim()).filter(d => d),
       photos: formData.photos.split(',').map(p => p.trim()).filter(p => p),
       remarks: formData.remarks,
-      nutritionStatus: formData.nutritionStatus,
+      nutritionStatus: formData.nutrition_status,
       medicalHistory: [],
       registrationDate: new Date().toISOString().split('T')[0],
       registeredBy: currentUser?.employee_id || 'SYSTEM',
-      riskScore: formData.nutritionStatus === 'severely_malnourished' ? 85 :
-                 formData.nutritionStatus === 'malnourished' ? 60 : 30,
-      nutritionalDeficiency: formData.nutritionStatus === 'severely_malnourished' ?
+      riskScore: formData.nutrition_status === 'severely_malnourished' ? 85 :
+                 formData.nutrition_status === 'malnourished' ? 60 : 30,
+      nutritionalDeficiency: formData.nutrition_status === 'severely_malnourished' ?
                            ['Protein', 'Iron', 'Vitamin D'] :
-                           formData.nutritionStatus === 'malnourished' ?
+                           formData.nutrition_status === 'malnourished' ?
                            ['Iron', 'Vitamin D'] : [],
       nextVisit: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
@@ -84,7 +84,7 @@ const PatientRegistration: React.FC = () => {
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (patient.aadhaarNumber && patient.aadhaarNumber.includes(searchTerm))
+    (patient.aadhaar_number && patient.aadhaar_number.includes(searchTerm))
   );
 
   const getStatusColor = (status: string) => {
@@ -169,7 +169,7 @@ const PatientRegistration: React.FC = () => {
             <div>
               <p className="text-sm text-red-600">SAM Cases</p>
               <p className="text-2xl font-bold text-red-800">
-                {patients.filter(p => p.nutritionStatus === 'severely_malnourished').length}
+                {patients.filter(p => p.nutrition_status === 'severely_malnourished').length}
               </p>
             </div>
           </div>
@@ -198,18 +198,18 @@ const PatientRegistration: React.FC = () => {
                       {patient.type === 'child' ? 'Child' : 'Pregnant Woman'} • Age: {patient.age}
                       {patient.pregnancyWeek && ` • ${patient.pregnancyWeek} weeks`}
                     </p>
-                    <p className="text-xs text-gray-500">Aadhaar: {patient.aadhaarNumber}</p>
+                    <p className="text-xs text-gray-500">Aadhaar: {patient.aadhaar_number}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patient.nutritionStatus)}`}>
-                      {patient.nutritionStatus === 'severely_malnourished' ? 'SAM' : 
-                       patient.nutritionStatus === 'malnourished' ? 'MAM' : 'Normal'}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patient.nutrition_status)}`}>
+                      {patient.nutrition_status === 'severely_malnourished' ? 'SAM' : 
+                       patient.nutrition_status === 'malnourished' ? 'MAM' : 'Normal'}
                     </span>
-                    {patient.riskScore && (
-                      <div className={`mt-1 px-2 py-1 rounded-full text-xs font-medium ${getRiskScoreColor(patient.riskScore)}`}>
-                        Risk: {patient.riskScore}%
+                    {patient.risk_score && (
+                      <div className={`mt-1 px-2 py-1 rounded-full text-xs font-medium ${getRiskScoreColor(patient.risk_score)}`}>
+                        Risk: {patient.risk_score}%
                       </div>
                     )}
                   </div>
@@ -233,11 +233,11 @@ const PatientRegistration: React.FC = () => {
                 </div>
               )}
 
-              {patient.nutritionalDeficiency && patient.nutritionalDeficiency.length > 0 && (
+              {patient.nutritional_deficiency && patient.nutritional_deficiency.length > 0 && (
                 <div className="mt-2">
                   <p className="text-sm font-medium text-gray-700 mb-2">Nutritional Deficiencies:</p>
                   <div className="flex flex-wrap gap-2">
-                    {patient.nutritionalDeficiency.map((deficiency: string, index: number) => (
+                    {patient.nutritional_deficiency.map((deficiency: string, index: number) => (
                       <span key={index} className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs">
                         {deficiency}
                       </span>
@@ -284,7 +284,7 @@ const PatientRegistration: React.FC = () => {
                       required
                       pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}"
                       placeholder="1234-5678-9012"
-                      value={formData.aadhaarNumber}
+                      value={formData.aadhaar_number}
                       onChange={(e) => setFormData({...formData, aadhaarNumber: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
@@ -385,7 +385,7 @@ const PatientRegistration: React.FC = () => {
                     <input
                       type="text"
                       placeholder="120/80"
-                      value={formData.bloodPressure}
+                      value={formData.blood_pressure}
                       onChange={(e) => setFormData({...formData, bloodPressure: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
@@ -393,7 +393,7 @@ const PatientRegistration: React.FC = () => {
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nutrition Status *</label>
                     <select
-                      value={formData.nutritionStatus}
+                      value={formData.nutrition_status}
                       onChange={(e) => setFormData({...formData, nutritionStatus: e.target.value as any})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >

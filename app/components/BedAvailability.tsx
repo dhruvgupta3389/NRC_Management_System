@@ -33,31 +33,31 @@ const BedAvailability: React.FC = () => {
 
   const BedRequestForm = () => {
     const [formData, setFormData] = useState({
-      patientId: '',
-      urgencyLevel: 'medium' as 'low' | 'medium' | 'high' | 'critical',
-      medicalJustification: '',
-      currentCondition: '',
-      estimatedStayDuration: '',
-      specialRequirements: '',
+      patient_id: '',
+      urgency_level: 'medium' as 'low' | 'medium' | 'high' | 'critical',
+      medical_justification: '',
+      current_condition: '',
+      estimated_stay_duration: '',
+      special_requirements: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       addBedRequest({
         ...formData,
-        requestedBy: 'HW001',
-        requestDate: new Date().toISOString().split('T')[0],
-        estimatedStayDuration: parseInt(formData.estimatedStayDuration),
+        requested_by: 'HW001',
+        request_date: new Date().toISOString().split('T')[0],
+        estimated_stay_duration: parseInt(formData.estimated_stay_duration),
         status: 'pending',
       });
       setShowRequestForm(false);
       setFormData({
-        patientId: '',
-        urgencyLevel: 'medium',
-        medicalJustification: '',
-        currentCondition: '',
-        estimatedStayDuration: '',
-        specialRequirements: '',
+        patient_id: '',
+        urgency_level: 'medium',
+        medical_justification: '',
+        current_condition: '',
+        estimated_stay_duration: '',
+        special_requirements: '',
       });
     };
 
@@ -72,8 +72,8 @@ const BedAvailability: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patientId}
-                onChange={(e) => setFormData({...formData, patientId: e.target.value})}
+                value={formData.patient_id}
+                onChange={(e) => setFormData({...formData, patient_id: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('patient.selectPatient')}</option>
@@ -87,8 +87,8 @@ const BedAvailability: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('bed.urgencyLevel')}</label>
               <select
-                value={formData.urgencyLevel}
-                onChange={(e) => setFormData({...formData, urgencyLevel: e.target.value as 'low' | 'medium' | 'high' | 'critical'})}
+                value={formData.urgency_level}
+                onChange={(e) => setFormData({...formData, urgency_level: e.target.value as 'low' | 'medium' | 'high' | 'critical'})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="low">{t('urgency.low')}</option>
@@ -101,8 +101,8 @@ const BedAvailability: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('bed.medicalJustification')}</label>
               <textarea
                 required
-                value={formData.medicalJustification}
-                onChange={(e) => setFormData({...formData, medicalJustification: e.target.value})}
+                value={formData.medical_justification}
+                onChange={(e) => setFormData({...formData, medical_justification: e.target.value})}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Provide medical justification for bed request..."
@@ -112,8 +112,8 @@ const BedAvailability: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Current Condition</label>
               <textarea
                 required
-                value={formData.currentCondition}
-                onChange={(e) => setFormData({...formData, currentCondition: e.target.value})}
+                value={formData.current_condition}
+                onChange={(e) => setFormData({...formData, current_condition: e.target.value})}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Describe patient's current condition..."
@@ -124,8 +124,8 @@ const BedAvailability: React.FC = () => {
               <input
                 type="number"
                 required
-                value={formData.estimatedStayDuration}
-                onChange={(e) => setFormData({...formData, estimatedStayDuration: e.target.value})}
+                value={formData.estimated_stay_duration}
+                onChange={(e) => setFormData({...formData, estimated_stay_duration: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Days"
               />
@@ -133,8 +133,8 @@ const BedAvailability: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('bed.specialRequirements')}</label>
               <textarea
-                value={formData.specialRequirements}
-                onChange={(e) => setFormData({...formData, specialRequirements: e.target.value})}
+                value={formData.special_requirements}
+                onChange={(e) => setFormData({...formData, special_requirements: e.target.value})}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Any special requirements or considerations..."
@@ -217,7 +217,7 @@ const BedAvailability: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {beds.map(bed => {
-          const patient = bed.patientId ? patients.find(p => p.id === bed.patientId) : null;
+          const patient = bed.patient_id ? patients.find(p => p.id === bed.patient_id) : null;
           
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -248,13 +248,13 @@ const BedAvailability: React.FC = () => {
                   <div className="space-y-1 text-sm text-gray-600">
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-3 h-3" />
-                      <span>Admitted: {bed.admissionDate ? new Date(bed.admissionDate).toLocaleDateString() : 'N/A'}</span>
+                      <span>Admitted: {bed.admission_date ? new Date(bed.admission_date).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     <div>
                       <span className="font-medium">Type:</span> {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')}
                     </div>
                     <div>
-                      <span className="font-medium">{t('common.status')}:</span> {patient.nutritionStatus.replace('_', ' ')}
+                      <span className="font-medium">{t('common.status')}:</span> {patient.nutrition_status.replace('_', ' ')}
                     </div>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ const BedAvailability: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Bed Requests</h3>
         <div className="space-y-4">
           {bedRequests.slice(0, 5).map(request => {
-            const patient = patients.find(p => p.id === request.patientId);
+            const patient = patients.find(p => p.id === request.patient_id);
             return (
               <div key={request.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-4">

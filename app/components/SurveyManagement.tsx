@@ -11,10 +11,10 @@ const SurveyManagement: React.FC = () => {
   const [selectedPatient, setSelectedPatient] = useState<string>('all');
 
   const filteredSurveys = surveys.filter(survey => {
-    const patient = patients.find(p => p.id === survey.patientId);
+    const patient = patients.find(p => p.id === survey.patient_id);
     const matchesSearch = patient?.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          survey.observations.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPatient = selectedPatient === 'all' || survey.patientId === selectedPatient;
+    const matchesPatient = selectedPatient === 'all' || survey.patient_id === selectedPatient;
     return matchesSearch && matchesPatient;
   });
 
@@ -76,7 +76,7 @@ const SurveyManagement: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patientId}
+                value={formData.patient_id}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -224,7 +224,7 @@ const SurveyManagement: React.FC = () => {
           </div>
         ) : (
           filteredSurveys.map(survey => {
-            const patient = patients.find(p => p.id === survey.patientId);
+            const patient = patients.find(p => p.id === survey.patient_id);
             if (!patient) return null;
 
             return (

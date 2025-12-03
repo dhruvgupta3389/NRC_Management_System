@@ -9,7 +9,7 @@ const AdmissionTracking: React.FC = () => {
   const [filterType, setFilterType] = useState('all');
 
   const admittedPatients = patients.filter(p => {
-    const bed = beds.find(b => b.patientId === p.id);
+    const bed = beds.find(b => b.patient_id === p.id);
     return bed && bed.status === 'occupied';
   });
 
@@ -46,8 +46,8 @@ const AdmissionTracking: React.FC = () => {
                 <p className="text-sm text-yellow-600">Pending Discharge</p>
                 <p className="text-2xl font-bold text-yellow-800">
                   {admittedPatients.filter(p => {
-                    const bed = beds.find(b => b.patientId === p.id);
-                    return bed && new Date(bed.admissionDate!).getTime() < Date.now() - 7 * 24 * 60 * 60 * 1000;
+                    const bed = beds.find(b => b.patient_id === p.id);
+                    return bed && new Date(bed.admission_date!).getTime() < Date.now() - 7 * 24 * 60 * 60 * 1000;
                   }).length}
                 </p>
               </div>
@@ -60,8 +60,8 @@ const AdmissionTracking: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recently Admitted Patients</h3>
         <div className="space-y-4">
           {recentAdmissions.map(patient => {
-            const bed = beds.find(b => b.patientId === patient.id);
-            const admissionDate = bed?.admissionDate ? new Date(bed.admissionDate) : new Date();
+            const bed = beds.find(b => b.patient_id === patient.id);
+            const admissionDate = bed?.admission_date ? new Date(bed.admission_date) : new Date();
             const daysAdmitted = Math.floor((Date.now() - admissionDate.getTime()) / (1000 * 60 * 60 * 24));
 
             return (
@@ -79,7 +79,7 @@ const AdmissionTracking: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">
-                    Bed {bed?.number} • {bed?.ward}
+                    Bed {bed?.bed_number} • {bed?.ward}
                   </p>
                   <div className="flex items-center space-x-1 mt-1 text-sm text-gray-600">
                     <Calendar className="w-3 h-3" />

@@ -9,15 +9,15 @@ const PostHospitalizationTracker: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedTracker, setSelectedTracker] = useState<TreatmentTracker | null>(null);
 
-  const dischargedPatients = treatmentTrackers.filter(tracker => tracker.dischargeDate);
-  const activeTrackers = treatmentTrackers.filter(tracker => !tracker.dischargeDate);
+  const dischargedPatients = treatmentTrackers.filter(tracker => tracker.discharge_date);
+  const activeTrackers = treatmentTrackers.filter(tracker => !tracker.discharge_date);
 
   const AddTrackerForm = () => {
     const [formData, setFormData] = useState({
-      patientId: '',
-      hospitalId: 'HOSP001',
-      treatmentPlan: '',
-      doctorRemarks: '',
+      patient_id: '',
+      hospital_id: 'HOSP001',
+      treatment_plan: '',
+      doctor_remarks: '',
       weight: '',
       appetite: 'moderate' as 'poor' | 'moderate' | 'good',
       notes: '',
@@ -26,19 +26,19 @@ const PostHospitalizationTracker: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       addTreatmentTracker({
-        patientId: formData.patientId,
-        hospitalId: formData.hospitalId,
-        admissionDate: new Date().toISOString().split('T')[0],
-        treatmentPlan: formData.treatmentPlan.split(',').map(t => t.trim()).filter(t => t),
-        medicineSchedule: [],
-        doctorRemarks: formData.doctorRemarks.split(',').map(r => r.trim()).filter(r => r),
-        dailyProgress: [{
+        patient_id: formData.patient_id,
+        hospital_id: formData.hospital_id,
+        admission_date: new Date().toISOString().split('T')[0],
+        treatment_plan: formData.treatment_plan.split(',').map(t => t.trim()).filter(t => t),
+        medicine_schedule: [],
+        doctor_remarks: formData.doctor_remarks.split(',').map(r => r.trim()).filter(r => r),
+        daily_progress: [{
           date: new Date().toISOString().split('T')[0],
           weight: parseFloat(formData.weight),
           appetite: formData.appetite,
           notes: formData.notes,
         }],
-        labReports: [],
+        lab_reports: [],
       });
       setShowAddForm(false);
     };
@@ -54,8 +54,8 @@ const PostHospitalizationTracker: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patientId}
-                onChange={(e) => setFormData({...formData, patientId: e.target.value})}
+                value={formData.patient_id}
+                onChange={(e) => setFormData({...formData, patient_id: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('patient.selectPatient')}</option>
@@ -70,8 +70,8 @@ const PostHospitalizationTracker: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Treatment Plan (comma separated)</label>
               <textarea
                 required
-                value={formData.treatmentPlan}
-                onChange={(e) => setFormData({...formData, treatmentPlan: e.target.value})}
+                value={formData.treatment_plan}
+                onChange={(e) => setFormData({...formData, treatment_plan: e.target.value})}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Therapeutic feeding, Iron supplementation, Regular monitoring"
@@ -80,8 +80,8 @@ const PostHospitalizationTracker: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Remarks (comma separated)</label>
               <textarea
-                value={formData.doctorRemarks}
-                onChange={(e) => setFormData({...formData, doctorRemarks: e.target.value})}
+                value={formData.doctor_remarks}
+                onChange={(e) => setFormData({...formData, doctor_remarks: e.target.value})}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Patient responding well, Continue current treatment"
@@ -144,7 +144,7 @@ const PostHospitalizationTracker: React.FC = () => {
   };
 
   const TrackerDetailsModal = ({ tracker }: { tracker: TreatmentTracker }) => {
-    const patient = patients.find(p => p.id === tracker.patientId);
+    const patient = patients.find(p => p.id === tracker.patient_id);
     
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -171,7 +171,7 @@ const PostHospitalizationTracker: React.FC = () => {
                 <div><span className="font-medium">{t('common.name')}:</span> {patient?.name}</div>
                 <div><span className="font-medium">{t('common.age')}:</span> {patient?.age} years</div>
                 <div><span className="font-medium">Type:</span> {patient?.type === 'child' ? t('patient.child') : t('patient.pregnant')}</div>
-                <div><span className="font-medium">Admission:</span> {new Date(tracker.admissionDate).toLocaleDateString()}</div>
+                <div><span className="font-medium">Admission:</span> {new Date(tracker.admission_date).toLocaleDateString()}</div>
               </div>
             </div>
 
@@ -317,7 +317,7 @@ const PostHospitalizationTracker: React.FC = () => {
           </div>
         ) : (
           treatmentTrackers.map(tracker => {
-            const patient = patients.find(p => p.id === tracker.patientId);
+            const patient = patients.find(p => p.id === tracker.patient_id);
             const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
             
             return (
@@ -335,7 +335,7 @@ const PostHospitalizationTracker: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    {tracker.dischargeDate ? (
+                    {tracker.discharge_date ? (
                       <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                         Discharged
                       </span>
@@ -357,13 +357,13 @@ const PostHospitalizationTracker: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Treatment Progress</h4>
                     <div className="space-y-1 text-sm text-gray-600">
-                      <div>Admission: {new Date(tracker.admissionDate).toLocaleDateString()}</div>
-                      {tracker.dischargeDate && (
-                        <div>Discharge: {new Date(tracker.dischargeDate).toLocaleDateString()}</div>
+                      <div>Admission: {new Date(tracker.admission_date).toLocaleDateString()}</div>
+                      {tracker.discharge_date && (
+                        <div>Discharge: {new Date(tracker.discharge_date).toLocaleDateString()}</div>
                       )}
-                      <div>Duration: {tracker.dischargeDate ? 
-                        Math.ceil((new Date(tracker.dischargeDate).getTime() - new Date(tracker.admissionDate).getTime()) / (1000 * 60 * 60 * 24)) :
-                        Math.ceil((new Date().getTime() - new Date(tracker.admissionDate).getTime()) / (1000 * 60 * 60 * 24))
+                      <div>Duration: {tracker.discharge_date ? 
+                        Math.ceil((new Date(tracker.discharge_date).getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24)) :
+                        Math.ceil((new Date().getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24))
                       } days</div>
                     </div>
                   </div>

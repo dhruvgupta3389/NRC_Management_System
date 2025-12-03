@@ -43,7 +43,7 @@ const VisitScheduling: React.FC = () => {
     const visit = visits.find(v => v.id === visitId);
     if (visit) {
       const newTicket = {
-        patientId: visit.patientId,
+        patientId: visit.patient_id,
         visitId: visitId,
         dateReported: new Date().toISOString().split('T')[0],
         reportedBy: visit.healthWorkerId,
@@ -115,7 +115,7 @@ const VisitScheduling: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patientId}
+                value={formData.patient_id}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -230,7 +230,7 @@ const VisitScheduling: React.FC = () => {
           </div>
           <div className="mt-3 space-y-2">
             {missedVisits.slice(0, 3).map(visit => {
-              const patient = patients.find(p => p.id === visit.patientId);
+              const patient = patients.find(p => p.id === visit.patient_id);
               return (
                 <div key={visit.id} className="flex items-center justify-between bg-white p-3 rounded-md">
                   <div>
@@ -277,7 +277,7 @@ const VisitScheduling: React.FC = () => {
             </div>
           ) : (
             filteredVisits.map(visit => {
-              const patient = patients.find(p => p.id === visit.patientId);
+              const patient = patients.find(p => p.id === visit.patient_id);
               if (!patient) return null;
 
               return (

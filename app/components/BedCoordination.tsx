@@ -67,7 +67,7 @@ const BedCoordination: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBeds.map(bed => {
-          const patient = bed.patientId ? patients.find(p => p.id === bed.patientId) : null;
+          const patient = bed.patient_id ? patients.find(p => p.id === bed.patient_id) : null;
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -91,7 +91,7 @@ const BedCoordination: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(bed.admissionDate!).toLocaleDateString()}</span>
+                      <span>{new Date(bed.admission_date!).toLocaleDateString()}</span>
                     </div>
                   </>
                 )}

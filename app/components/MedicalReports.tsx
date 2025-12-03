@@ -18,7 +18,7 @@ const MedicalReports: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Medical Records</h3>
         <div className="space-y-4">
           {medicalRecords.slice(0, 10).map(record => {
-            const patient = patients.find(p => p.id === record.patientId);
+            const patient = patients.find(p => p.id === record.patient_id);
             return (
               <div key={record.id} className="p-4 bg-gray-50 rounded-lg flex items-center justify-between">
                 <div className="flex items-center space-x-4">

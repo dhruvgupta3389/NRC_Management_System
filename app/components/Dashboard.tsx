@@ -33,14 +33,14 @@ const Dashboard: React.FC = () => {
   const { patients, visits, beds, notifications, userRole, t } = useApp();
 
   const getStatistics = () => {
-    const totalPatients = patients.length;
-    const childPatients = patients.filter(p => p.type === 'child').length;
-    const pregnantPatients = patients.filter(p => p.type === 'pregnant').length;
-    const severelyMalnourished = patients.filter(p => p.nutritionStatus === 'severely_malnourished').length;
-    const unreadNotifications = notifications.filter(n => !n.read).length;
-    const todaysVisits = visits.filter(v => v.scheduledDate === new Date().toISOString().split('T')[0]).length;
-    const availableBeds = beds.filter(b => b.status === 'available').length;
-    const occupiedBeds = beds.filter(b => b.status === 'occupied').length;
+    const totalPatients = patients?.length || 0;
+    const childPatients = patients?.filter(p => p.type === 'child')?.length || 0;
+    const pregnantPatients = patients?.filter(p => p.type === 'pregnant_woman')?.length || 0;
+    const severelyMalnourished = patients?.filter(p => p.nutrition_status === 'severely_malnourished')?.length || 0;
+    const unreadNotifications = notifications?.filter(n => !n.is_read)?.length || 0;
+    const todaysVisits = visits?.filter(v => v.scheduled_date === new Date().toISOString().split('T')[0])?.length || 0;
+    const availableBeds = beds?.filter(b => b.status === 'available')?.length || 0;
+    const occupiedBeds = beds?.filter(b => b.status === 'occupied')?.length || 0;
 
     return {
       totalPatients,

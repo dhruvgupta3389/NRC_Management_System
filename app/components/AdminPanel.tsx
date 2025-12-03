@@ -78,14 +78,14 @@ const AdminPanel: React.FC = () => {
     };
 
     const [formData, setFormData] = useState({
-      employeeId: user?.employee_id || generateEmployeeId(),
+      employee_id: user?.employee_id || generateEmployeeId(),
       username: user?.username || '',
       password: '',
       name: user?.name || '',
       role: user?.role || 'anganwadi_worker' as 'anganwadi_worker' | 'supervisor' | 'hospital' | 'admin',
-      contactNumber: user?.contact_number || '',
+      contact_number: user?.contact_number || '',
       email: user?.email || '',
-      isActive: user?.is_active ?? true
+      is_active: user?.is_active ?? true
     });
     const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -145,7 +145,7 @@ const AdminPanel: React.FC = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    value={formData.employeeId}
+                    value={formData.employee_id}
                     readOnly
                     className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                   />
@@ -214,8 +214,8 @@ const AdminPanel: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
                 <input
                   type="tel"
-                  value={formData.contactNumber}
-                  onChange={(e) => setFormData({...formData, contactNumber: e.target.value})}
+                  value={formData.contact_number}
+                  onChange={(e) => setFormData({...formData, contact_number: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 />
               </div>
@@ -233,8 +233,8 @@ const AdminPanel: React.FC = () => {
                   <label className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
+                      checked={formData.is_active}
+                      onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
                       className="mr-2 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     />
                     <span className="text-sm text-gray-700">Active User</span>
