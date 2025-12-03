@@ -482,6 +482,63 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  // Bed Request Operations
+  const loadBedRequests = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/bed-requests');
+      if (!response.ok) throw new Error('Failed to load bed requests');
+
+      const data = await response.json();
+      setBedRequests(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading bed requests';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addBedRequest = async (request: Omit<BedRequest, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/bed-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+      });
+
+      if (!response.ok) throw new Error('Failed to add bed request');
+      const data = await response.json();
+      setBedRequests([...bedRequests, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding bed request';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const updateBedRequest = async (id: string, updates: Partial<BedRequest>) => {
+    try {
+      const response = await fetch(`/api/bed-requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) throw new Error('Failed to update bed request');
+      const data = await response.json();
+      setBedRequests(bedRequests.map(req => req.id === id ? data : req));
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error updating bed request';
+      setError(message);
+      throw err;
+    }
+  };
+
   // Load current user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
