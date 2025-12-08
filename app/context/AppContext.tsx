@@ -271,6 +271,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [visits, setVisits] = useState<Visit[]>([]);
   const [bedRequests, setBedRequests] = useState<BedRequest[]>([]);
   const [treatmentTrackers, setTreatmentTrackers] = useState<TreatmentTracker[]>([]);
+  const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
+  const [workers, setWorkers] = useState<AnganwadiWorker[]>([]);
+  const [visitTickets, setVisitTickets] = useState<AnganwadiVisitTicket[]>([]);
 
   // Translation function
   const t = (key: string, params?: Record<string, string | number>): string => {
