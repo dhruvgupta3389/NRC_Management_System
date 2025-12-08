@@ -10,7 +10,6 @@ const BedAvailability: React.FC = () => {
   useEffect(() => {
     loadBeds();
     loadPatients();
-    loadBedRequests();
   }, []);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedBed, setSelectedBed] = useState<string>('');

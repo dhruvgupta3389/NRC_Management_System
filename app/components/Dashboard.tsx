@@ -36,7 +36,6 @@ const Dashboard: React.FC = () => {
     loadPatients();
     loadBeds();
     loadNotifications();
-    loadVisits();
   }, []);
 
   const getStatistics = () => {

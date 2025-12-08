@@ -8,7 +8,6 @@ const BedRequests: React.FC = () => {
   const { bedRequests, patients, beds, updateBedRequest, updateBed, loadBedRequests, loadPatients, loadBeds, t } = useApp();
 
   useEffect(() => {
-    loadBedRequests();
     loadPatients();
     loadBeds();
   }, []);

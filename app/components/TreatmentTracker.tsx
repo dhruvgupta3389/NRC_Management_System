@@ -8,7 +8,6 @@ const TreatmentTracker: React.FC = () => {
   const { treatmentTrackers, patients, loadTreatmentTrackers, loadPatients, t } = useApp();
 
   useEffect(() => {
-    loadTreatmentTrackers();
     loadPatients();
   }, []);
 

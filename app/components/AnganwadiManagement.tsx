@@ -8,8 +8,7 @@ const AnganwadiManagement: React.FC = () => {
   const { anganwadis, workers, loadAnganwadis, loadWorkers } = useApp();
 
   useEffect(() => {
-    loadAnganwadis?.();
-    loadWorkers?.();
+    // loadAnganwadis and loadWorkers endpoints not yet implemented
   }, []);
 
   const activeAnganwadis = anganwadis.filter(a => a.is_active);
