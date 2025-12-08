@@ -232,7 +232,7 @@ const BedAvailability: React.FC = () => {
                     <Bed className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Bed {bed.number}</h3>
+                    <h3 className="font-semibold text-gray-900">Bed {bed.bed_number}</h3>
                     <p className="text-sm text-gray-600">{bed.ward} Ward</p>
                   </div>
                 </div>
@@ -283,14 +283,14 @@ const BedAvailability: React.FC = () => {
                   <div>
                     <h4 className="font-medium text-gray-900">{patient?.name}</h4>
                     <p className="text-sm text-gray-600">
-                      {request.urgencyLevel} urgency • {request.estimatedStayDuration} days
+                      {request.urgency_level} urgency • {request.estimated_stay_duration} days
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Clock className="w-4 h-4 text-gray-500" />
                   <span className="text-sm text-gray-600">
-                    {new Date(request.requestDate).toLocaleDateString()}
+                    {new Date(request.request_date).toLocaleDateString()}
                   </span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
