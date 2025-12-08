@@ -98,7 +98,6 @@ const BedRequests: React.FC = () => {
       hospitalName: 'District Hospital Patna',
       contactNumber: '+91 612-2234567',
       referralReason: '',
-      urgencyLevel: 'urgent' as 'routine' | 'urgent' | 'emergency',
     });
 
     const handleApproveRequest = () => {
@@ -123,9 +122,6 @@ const BedRequests: React.FC = () => {
       
       const updates: Partial<BedRequest> = {
         status: 'declined',
-        reviewedBy: 'Dr. Supervisor',
-        reviewDate: new Date().toISOString().split('T')[0],
-        reviewComments,
         hospitalReferral: {
           ...hospitalData,
           referralDate: new Date().toISOString().split('T')[0],
@@ -176,17 +172,17 @@ const BedRequests: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Request Date:</span>
-                    <span className="text-sm font-medium">{new Date(request.requestDate).toLocaleDateString()}</span>
+                    <span className="text-sm font-medium">{new Date(request.request_date).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">{t('bed.urgencyLevel')}:</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgencyLevel)}`}>
-                      {t(`urgency.${request.urgencyLevel}`)}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgency_level)}`}>
+                      {t(`urgency.${request.urgency_level}`)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">{t('bed.estimatedStay')}:</span>
-                    <span className="text-sm font-medium">{request.estimatedStayDuration} days</span>
+                    <span className="text-sm font-medium">{request.estimated_stay_duration} days</span>
                   </div>
                 </div>
               </div>
