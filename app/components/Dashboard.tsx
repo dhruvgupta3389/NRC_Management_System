@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Users, Calendar, AlertTriangle, Bed, TrendingUp, Clock,
   Activity, FileText, MapPin, UserCheck, Bell, Brain,
@@ -30,7 +30,14 @@ interface Activity {
 }
 
 const Dashboard: React.FC = () => {
-  const { patients, visits, beds, notifications, userRole, t } = useApp();
+  const { patients, visits, beds, notifications, userRole, t, loadPatients, loadBeds, loadNotifications, loadVisits } = useApp();
+
+  useEffect(() => {
+    loadPatients();
+    loadBeds();
+    loadNotifications();
+    loadVisits();
+  }, []);
 
   const getStatistics = () => {
     const totalPatients = patients?.length || 0;
