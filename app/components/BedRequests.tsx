@@ -445,7 +445,7 @@ const BedRequests: React.FC = () => {
             <div>
               <p className="text-sm text-orange-600">{t('urgency.critical')}</p>
               <p className="text-2xl font-bold text-orange-800">
-                {bedRequests.filter(r => r.urgencyLevel === 'critical').length}
+                {bedRequests.filter(r => r.urgency_level === 'critical').length}
               </p>
             </div>
           </div>
@@ -481,8 +481,8 @@ const BedRequests: React.FC = () => {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
                       {t(`common.${request.status}`)}
                     </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgencyLevel)}`}>
-                      {t(`urgency.${request.urgencyLevel}`)}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgency_level)}`}>
+                      {t(`urgency.${request.urgency_level}`)}
                     </span>
                     <button
                       onClick={() => setSelectedRequest(request)}
@@ -497,9 +497,9 @@ const BedRequests: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Request Details</h4>
                     <div className="space-y-1 text-sm text-gray-600">
-                      <div>Requested by: {request.requestedBy}</div>
-                      <div>{t('common.date')}: {new Date(request.requestDate).toLocaleDateString()}</div>
-                      <div>Duration: {request.estimatedStayDuration} days</div>
+                      <div>Requested by: {request.requested_by}</div>
+                      <div>{t('common.date')}: {new Date(request.request_date).toLocaleDateString()}</div>
+                      <div>Duration: {request.estimated_stay_duration} days</div>
                     </div>
                   </div>
                   <div>
