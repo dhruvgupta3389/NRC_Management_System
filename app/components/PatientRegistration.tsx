@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search, User, Baby, Heart, FileText, Camera, Upload, AlertTriangle } from 'lucide-react';
 import { useApp, Patient } from '../context/AppContext';
 
 const PatientRegistration: React.FC = () => {
-  const { patients, addPatient, currentUser, t } = useApp();
+  const { patients, addPatient, currentUser, loadPatients, t } = useApp();
+
+  useEffect(() => {
+    loadPatients();
+  }, []);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 

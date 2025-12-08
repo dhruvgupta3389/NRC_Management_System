@@ -1,11 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserCheck, Clock, CheckCircle, User, Calendar, FileText } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const AdmissionTracking: React.FC = () => {
-  const { beds, patients, t } = useApp();
+  const { beds, patients, loadBeds, loadPatients, t } = useApp();
+
+  useEffect(() => {
+    loadBeds();
+    loadPatients();
+  }, []);
   const [filterType, setFilterType] = useState('all');
 
   const admittedPatients = patients.filter(p => {
