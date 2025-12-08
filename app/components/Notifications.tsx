@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, CheckCircle, AlertTriangle, Clock, User, Calendar, Eye, AreaChart as MarkAsUnread } from 'lucide-react';
 import { useApp, Notification } from '../context/AppContext';
 
 const Notifications: React.FC = () => {
-  const { notifications, markNotificationRead, t } = useApp();
+  const { notifications, markNotificationRead, loadNotifications, t } = useApp();
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
   const [filterType, setFilterType] = useState<'all' | 'admission_status' | 'bed_approval' | 'supervisor_instruction' | 'high_risk_alert' | 'bed_request' | 'discharge_tracking'>('all');
   const [filterRead, setFilterRead] = useState<'all' | 'read' | 'unread'>('all');
 
