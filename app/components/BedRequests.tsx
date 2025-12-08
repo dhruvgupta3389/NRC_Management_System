@@ -17,7 +17,7 @@ const BedRequests: React.FC = () => {
 
   const filteredRequests = bedRequests.filter(request => {
     const matchesStatus = filterStatus === 'all' || request.status === filterStatus;
-    const matchesUrgency = filterUrgency === 'all' || request.urgencyLevel === filterUrgency;
+    const matchesUrgency = filterUrgency === 'all' || request.urgency_level === filterUrgency;
     return matchesStatus && matchesUrgency;
   });
 
@@ -63,15 +63,12 @@ const BedRequests: React.FC = () => {
     if (availableBed) {
       updateBedRequest(requestId, {
         status: 'approved',
-        reviewedBy: 'Dr. Supervisor',
-        reviewDate: new Date().toISOString().split('T')[0],
-        reviewComments: `Approved for ${request.estimatedStayDuration} days. Bed ${availableBed.number} assigned.`,
       });
 
       updateBed(availableBed.id, {
         status: 'occupied',
-        patientId: request.patient_id,
-        admissionDate: new Date().toISOString().split('T')[0],
+        patient_id: request.patient_id,
+        admission_date: new Date().toISOString().split('T')[0],
       });
     }
   };
@@ -79,9 +76,6 @@ const BedRequests: React.FC = () => {
   const handleDecline = (requestId: string, reason: string, referToHospital: boolean = false) => {
     const updates: Partial<BedRequest> = {
       status: 'declined',
-      reviewedBy: 'Dr. Supervisor',
-      reviewDate: new Date().toISOString().split('T')[0],
-      reviewComments: reason,
     };
 
     if (referToHospital) {
@@ -90,7 +84,6 @@ const BedRequests: React.FC = () => {
         contactNumber: '+91 612-2234567',
         referralReason: reason,
         referralDate: new Date().toISOString().split('T')[0],
-        urgencyLevel: 'urgent',
       };
     }
 
