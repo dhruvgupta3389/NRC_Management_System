@@ -197,6 +197,15 @@ interface AppContextType {
   addTreatmentTracker: (tracker: Omit<TreatmentTracker, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateTreatmentTracker: (id: string, updates: Partial<TreatmentTracker>) => Promise<void>;
 
+  // Anganwadi Management
+  anganwadis: Anganwadi[];
+  workers: AnganwadiWorker[];
+  visitTickets: AnganwadiVisitTicket[];
+  loadAnganwadis: () => Promise<void>;
+  loadWorkers: () => Promise<void>;
+  addVisitTicket: (ticket: Omit<AnganwadiVisitTicket, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateVisitTicket: (id: string, updates: Partial<AnganwadiVisitTicket>) => Promise<void>;
+
   loading: boolean;
   error: string | null;
 }
