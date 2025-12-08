@@ -1124,6 +1124,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadTreatmentTrackers,
     addTreatmentTracker,
     updateTreatmentTracker,
+    anganwadis,
+    workers,
+    visitTickets,
+    loadAnganwadis,
+    loadWorkers,
+    addVisitTicket,
+    updateVisitTicket,
     loading,
     error
   };
