@@ -1,11 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Building, Users, Activity, MapPin } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const AnganwadiManagement: React.FC = () => {
-  const { anganwadis, workers } = useApp();
+  const { anganwadis, workers, loadAnganwadis, loadWorkers } = useApp();
+
+  useEffect(() => {
+    loadAnganwadis?.();
+    loadWorkers?.();
+  }, []);
 
   const activeAnganwadis = anganwadis.filter(a => a.is_active);
 

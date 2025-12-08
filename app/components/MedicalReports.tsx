@@ -1,11 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FileText, Download, Calendar, User } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const MedicalReports: React.FC = () => {
-  const { medicalRecords = [], patients, t } = useApp();
+  const { medicalRecords = [], patients, loadPatients, t } = useApp();
+
+  useEffect(() => {
+    loadPatients();
+  }, []);
 
   return (
     <div className="space-y-6">

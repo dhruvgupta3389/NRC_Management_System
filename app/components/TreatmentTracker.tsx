@@ -1,11 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Activity, Heart, Pill, TrendingUp } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const TreatmentTracker: React.FC = () => {
-  const { treatmentTrackers, patients, t } = useApp();
+  const { treatmentTrackers, patients, loadTreatmentTrackers, loadPatients, t } = useApp();
+
+  useEffect(() => {
+    loadTreatmentTrackers();
+    loadPatients();
+  }, []);
 
   const activeTrackers = treatmentTrackers.filter(t => !t.dischargeDate);
   const completedTrackers = treatmentTrackers.filter(t => t.dischargeDate);
