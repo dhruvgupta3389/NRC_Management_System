@@ -116,6 +116,41 @@ export interface TreatmentTracker {
   updated_at: string;
 }
 
+export interface Anganwadi {
+  id: string;
+  name: string;
+  location: string;
+  contact_number?: string;
+  supervisor_id?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnganwadiWorker {
+  id: string;
+  name: string;
+  employee_id: string;
+  anganwadi_id?: string;
+  role: string;
+  contact_number?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnganwadiVisitTicket {
+  id: string;
+  patient_id: string;
+  anganwadi_id: string;
+  visit_date: string;
+  visit_type: string;
+  status: 'pending' | 'completed' | 'cancelled';
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AppContextType {
   // Language & Localization
   language: 'en' | 'hi';
