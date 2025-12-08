@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Zap, AlertTriangle, CheckCircle, TrendingUp, User } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const AIHealthPrediction: React.FC = () => {
-  const { patients, t } = useApp();
+  const { patients, loadPatients, t } = useApp();
+
+  useEffect(() => {
+    loadPatients();
+  }, []);
   const [selectedPatient, setSelectedPatient] = useState<string>('');
 
   const riskPatients = patients?.filter(p => p.risk_score && p.risk_score >= 70) || [];

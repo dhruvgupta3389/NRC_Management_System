@@ -1,11 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BarChart3, TrendingUp, AlertTriangle, Zap } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const BedDemandPrediction: React.FC = () => {
-  const { beds, patients } = useApp();
+  const { beds, patients, loadBeds, loadPatients } = useApp();
+
+  useEffect(() => {
+    loadBeds();
+    loadPatients();
+  }, []);
 
   const occupancyRate = (beds.filter(b => b.status === 'occupied').length / beds.length) * 100;
   const prediction = occupancyRate > 70 ? 'High Demand' : occupancyRate > 50 ? 'Medium Demand' : 'Low Demand';

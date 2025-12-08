@@ -1,11 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bed, Plus, CheckCircle, XCircle, AlertTriangle, User, Calendar, Clock, Activity, Phone, FileText, Eye } from 'lucide-react';
 import { useApp, BedRequest } from '../context/AppContext';
 
 const BedRequests: React.FC = () => {
-  const { bedRequests, patients, beds, updateBedRequest, updateBed, t } = useApp();
+  const { bedRequests, patients, beds, updateBedRequest, updateBed, loadPatients, loadBeds, t } = useApp();
+
+  useEffect(() => {
+    loadPatients();
+    loadBeds();
+  }, []);
   const [selectedRequest, setSelectedRequest] = useState<BedRequest | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'declined'>('all');
   const [filterUrgency, setFilterUrgency] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');

@@ -1,13 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bed, Plus, CheckCircle, XCircle, Wrench, User, Calendar, AlertCircle, FileText, Clock } from 'lucide-react';
 import { useApp, Bed as BedType } from '../context/AppContext';
 
 const BedDashboard: React.FC = () => {
-  const { beds, patients, bedRequests, updateBed, t } = useApp();
+  const { beds, patients, bedRequests, updateBed, loadBeds, t } = useApp();
   const [selectedWard, setSelectedWard] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+
+  useEffect(() => {
+    loadBeds();
+  }, []);
 
   const wards = ['all', ...Array.from(new Set(beds.map(bed => bed.ward)))];
 

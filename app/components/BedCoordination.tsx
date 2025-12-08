@@ -1,11 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Activity, Plus, CheckCircle, Clock, User, Calendar } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const BedCoordination: React.FC = () => {
-  const { beds, patients, t } = useApp();
+  const { beds, patients, loadBeds, loadPatients, t } = useApp();
+
+  useEffect(() => {
+    loadBeds();
+    loadPatients();
+  }, []);
   const [filterWard, setFilterWard] = useState('all');
 
   const occupiedBeds = beds.filter(b => b.status === 'occupied');
