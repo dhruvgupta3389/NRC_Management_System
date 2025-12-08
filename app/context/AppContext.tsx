@@ -934,6 +934,145 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  // Anganwadi Operations
+  const loadAnganwadis = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/anganwadis');
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load anganwadis');
+      }
+
+      setAnganwadis(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading anganwadis';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadWorkers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/workers');
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load workers');
+      }
+
+      setWorkers(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading workers';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addVisitTicket = async (ticket: Omit<AnganwadiVisitTicket, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/visit-tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ticket)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add visit ticket');
+      }
+
+      setVisitTickets([...visitTickets, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding visit ticket';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const updateVisitTicket = async (id: string, updates: Partial<AnganwadiVisitTicket>) => {
+    try {
+      const response = await fetch(`/api/visit-tickets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update visit ticket');
+      }
+
+      setVisitTickets(visitTickets.map(ticket => ticket.id === id ? data : ticket));
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error updating visit ticket';
+      setError(message);
+      throw err;
+    }
+  };
+
   // Load current user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
