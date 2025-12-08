@@ -5,7 +5,7 @@ import { Bed, Plus, CheckCircle, XCircle, AlertTriangle, Clock, User, Calendar, 
 import { useApp, BedRequest } from '../context/AppContext';
 
 const BedAvailability: React.FC = () => {
-  const { beds, patients, bedRequests, addBedRequest, updateBedRequest, loadBeds, loadPatients, loadBedRequests, t } = useApp();
+  const { beds, patients, bedRequests, addBedRequest, updateBedRequest, loadBeds, loadPatients, t } = useApp();
 
   useEffect(() => {
     loadBeds();

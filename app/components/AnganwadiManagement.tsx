@@ -5,7 +5,7 @@ import { Building, Users, Activity, MapPin } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const AnganwadiManagement: React.FC = () => {
-  const { anganwadis, workers, loadAnganwadis, loadWorkers } = useApp();
+  const { anganwadis, workers } = useApp();
 
   useEffect(() => {
     // loadAnganwadis and loadWorkers endpoints not yet implemented

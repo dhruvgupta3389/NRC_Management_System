@@ -5,7 +5,7 @@ import { Activity, Heart, Pill, TrendingUp } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 const TreatmentTracker: React.FC = () => {
-  const { treatmentTrackers, patients, loadTreatmentTrackers, loadPatients, t } = useApp();
+  const { treatmentTrackers, patients, loadPatients, t } = useApp();
 
   useEffect(() => {
     loadPatients();

@@ -30,7 +30,7 @@ interface Activity {
 }
 
 const Dashboard: React.FC = () => {
-  const { patients, visits, beds, notifications, userRole, t, loadPatients, loadBeds, loadNotifications, loadVisits } = useApp();
+  const { patients, visits, beds, notifications, userRole, t, loadPatients, loadBeds, loadNotifications } = useApp();
 
   useEffect(() => {
     loadPatients();
