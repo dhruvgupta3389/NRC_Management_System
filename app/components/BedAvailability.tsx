@@ -1,11 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bed, Plus, CheckCircle, XCircle, AlertTriangle, Clock, User, Calendar, Phone, FileText } from 'lucide-react';
 import { useApp, BedRequest } from '../context/AppContext';
 
 const BedAvailability: React.FC = () => {
-  const { beds, patients, bedRequests, addBedRequest, updateBedRequest, t } = useApp();
+  const { beds, patients, bedRequests, addBedRequest, updateBedRequest, loadBeds, loadPatients, loadBedRequests, t } = useApp();
+
+  useEffect(() => {
+    loadBeds();
+    loadPatients();
+    loadBedRequests();
+  }, []);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedBed, setSelectedBed] = useState<string>('');
 
