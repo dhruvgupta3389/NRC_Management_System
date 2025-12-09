@@ -408,7 +408,7 @@ const AnganwadiVisitTickets: React.FC = () => {
             <div>
               <p className="text-sm text-yellow-600">{t('common.inProgress')}</p>
               <p className="text-2xl font-bold text-yellow-800">
-                {visitTickets.filter(t => t.status === 'in_progress').length}
+                {visitTickets.filter((t: AnganwadiVisitTicket) => t.status === 'in_progress').length}
               </p>
             </div>
           </div>
