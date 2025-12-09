@@ -10,7 +10,7 @@ const CenterManagement: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const getAnganwadiWorkers = (anganwadiId: string) => {
-    return workers.filter(worker => worker.anganwadiId === anganwadiId && worker.is_active);
+    return workers.filter((worker: AnganwadiWorker) => worker.anganwadi_id === anganwadiId && worker.is_active);
   };
 
   const AnganwadiDetailsModal = ({ anganwadi }: { anganwadi: Anganwadi }) => {
