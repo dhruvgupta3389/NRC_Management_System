@@ -88,7 +88,7 @@ const AnganwadiManagement: React.FC = () => {
                   </div>
                 </div>
 
-                {anganwadi.facilities.length > 0 && (
+                {anganwadi.facilities && anganwadi.facilities.length > 0 && (
                   <div>
                     <p className="text-xs font-medium text-gray-700 mb-2">Facilities</p>
                     <div className="flex flex-wrap gap-1">
@@ -97,7 +97,7 @@ const AnganwadiManagement: React.FC = () => {
                           {facility}
                         </span>
                       ))}
-                      {anganwadi.facilities.length > 2 && (
+                      {anganwadi.facilities && anganwadi.facilities.length > 2 && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
                           +{anganwadi.facilities.length - 2} more
                         </span>
