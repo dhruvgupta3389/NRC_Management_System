@@ -242,7 +242,7 @@ const AnganwadiVisitTickets: React.FC = () => {
 
   const TicketDetailsModal = ({ ticket }: { ticket: AnganwadiVisitTicket }) => {
     const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadiId);
-    const worker = workers.find(w => w.id === ticket.workerId);
+    const worker = workers.find((w: AnganwadiWorker) => w.id === ticket.workerId);
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -455,7 +455,7 @@ const AnganwadiVisitTickets: React.FC = () => {
         ) : (
           filteredTickets.map(ticket => {
             const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadiId);
-            const worker = workers.find(w => w.id === ticket.workerId);
+            const worker = workers.find((w: AnganwadiWorker) => w.id === ticket.workerId);
             
             return (
               <div key={ticket.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
