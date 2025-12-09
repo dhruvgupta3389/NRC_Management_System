@@ -119,10 +119,14 @@ export interface TreatmentTracker {
 export interface Anganwadi {
   id: string;
   name: string;
-  location: string;
+  location: { area: string; district: string };
   contact_number?: string;
   supervisor_id?: string;
+  supervisor?: { id: string; name: string };
   is_active: boolean;
+  capacity?: { pregnantWomen: number; children: number };
+  facilities?: string[];
+  coverageAreas?: string[];
   created_at: string;
   updated_at: string;
 }
