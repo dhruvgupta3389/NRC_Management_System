@@ -139,6 +139,7 @@ export interface AnganwadiWorker {
   anganwadi_id?: string;
   role: string;
   contact_number?: string;
+  contactNumber?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
