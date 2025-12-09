@@ -50,8 +50,8 @@ const AnganwadiManagement: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {activeAnganwadis.map(anganwadi => {
-          const staffCount = workers.filter(w => w.anganwadiId === anganwadi.id).length;
+        {activeAnganwadis.map((anganwadi: Anganwadi) => {
+          const staffCount = workers.filter((w: AnganwadiWorker) => w.anganwadi_id === anganwadi.id).length;
           
           return (
             <div key={anganwadi.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
