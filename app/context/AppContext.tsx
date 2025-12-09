@@ -1018,6 +1018,76 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  const addAnganwadi = async (anganwadi: Omit<Anganwadi, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/anganwadis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(anganwadi)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add anganwadi');
+      }
+
+      setAnganwadis([...anganwadis, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding anganwadi';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const addWorker = async (worker: Omit<AnganwadiWorker, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/workers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(worker)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add worker');
+      }
+
+      setWorkers([...workers, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding worker';
+      setError(message);
+      throw err;
+    }
+  };
+
   const addVisitTicket = async (ticket: Omit<AnganwadiVisitTicket, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const response = await fetch('/api/visit-tickets', {
