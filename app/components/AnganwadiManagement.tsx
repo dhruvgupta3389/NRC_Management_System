@@ -11,7 +11,7 @@ const AnganwadiManagement: React.FC = () => {
     // loadAnganwadis and loadWorkers endpoints not yet implemented
   }, []);
 
-  const activeAnganwadis = anganwadis.filter(a => a.is_active);
+  const activeAnganwadis = anganwadis.filter((a: Anganwadi) => a.is_active);
 
   return (
     <div className="space-y-6">
