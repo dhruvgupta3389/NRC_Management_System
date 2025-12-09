@@ -141,12 +141,18 @@ export interface AnganwadiWorker {
 
 export interface AnganwadiVisitTicket {
   id: string;
-  patient_id: string;
   anganwadi_id: string;
-  visit_date: string;
+  workerId?: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
   visit_type: string;
-  status: 'pending' | 'completed' | 'cancelled';
-  notes?: string;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'missed' | 'cancelled';
+  assigned_area?: string;
+  targetBeneficiaries?: { pregnantWomen: number; children: number };
+  reported_by?: string;
+  reported_date?: string;
+  escalation_level?: string;
+  coverageAreas?: string[];
   created_at: string;
   updated_at: string;
 }
