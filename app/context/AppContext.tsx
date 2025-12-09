@@ -216,6 +216,8 @@ interface AppContextType {
   visitTickets: AnganwadiVisitTicket[];
   loadAnganwadis: () => Promise<void>;
   loadWorkers: () => Promise<void>;
+  addAnganwadi: (anganwadi: Omit<Anganwadi, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addWorker: (worker: Omit<AnganwadiWorker, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   addVisitTicket: (ticket: Omit<AnganwadiVisitTicket, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateVisitTicket: (id: string, updates: Partial<AnganwadiVisitTicket>) => Promise<void>;
 
