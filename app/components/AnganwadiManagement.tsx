@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Building, Users, Activity, MapPin } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import { useApp, Anganwadi, AnganwadiWorker } from '../context/AppContext';
 
 const AnganwadiManagement: React.FC = () => {
   const { anganwadis, workers } = useApp();
