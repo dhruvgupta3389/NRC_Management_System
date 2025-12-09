@@ -21,6 +21,7 @@ export interface Patient {
   type: 'child' | 'pregnant_woman' | 'lactating_mother';
   pregnancy_week?: number;
   contact_number: string;
+  contactNumber?: string;
   emergency_contact?: string;
   address: string;
   weight?: number;
