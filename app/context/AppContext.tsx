@@ -96,7 +96,8 @@ export interface BedRequest {
   special_requirements?: string;
   requested_by: string;
   request_date: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'declined';
+  hospitalReferral?: { hospitalName: string; contactNumber: string; referralReason: string; referralDate: string };
   created_at: string;
   updated_at: string;
 }
