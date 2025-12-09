@@ -80,11 +80,11 @@ const AnganwadiManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-pink-50 p-3 rounded">
                     <p className="text-xs text-pink-600 font-medium">Pregnant Women</p>
-                    <p className="text-lg font-bold text-pink-800">{anganwadi.capacity.pregnantWomen}</p>
+                    <p className="text-lg font-bold text-pink-800">{anganwadi.capacity?.pregnantWomen || 0}</p>
                   </div>
                   <div className="bg-blue-50 p-3 rounded">
                     <p className="text-xs text-blue-600 font-medium">Children</p>
-                    <p className="text-lg font-bold text-blue-800">{anganwadi.capacity.children}</p>
+                    <p className="text-lg font-bold text-blue-800">{anganwadi.capacity?.children || 0}</p>
                   </div>
                 </div>
 
