@@ -419,7 +419,7 @@ const AnganwadiVisitTickets: React.FC = () => {
             <div>
               <p className="text-sm text-green-600">{t('common.completed')}</p>
               <p className="text-2xl font-bold text-green-800">
-                {visitTickets.filter(t => t.status === 'completed').length}
+                {visitTickets.filter((t: AnganwadiVisitTicket) => t.status === 'completed').length}
               </p>
             </div>
           </div>
