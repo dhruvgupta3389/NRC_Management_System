@@ -453,7 +453,7 @@ const AnganwadiVisitTickets: React.FC = () => {
             <p className="text-gray-500">No visit tickets found</p>
           </div>
         ) : (
-          filteredTickets.map(ticket => {
+          filteredTickets.map((ticket: AnganwadiVisitTicket) => {
             const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadiId);
             const worker = workers.find((w: AnganwadiWorker) => w.id === ticket.workerId);
             
