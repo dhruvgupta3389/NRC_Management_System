@@ -69,7 +69,7 @@ const AnganwadiManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gray-50 p-3 rounded">
                     <p className="text-xs text-gray-600">Supervisor</p>
-                    <p className="text-sm font-medium text-gray-900">{anganwadi.supervisor.name}</p>
+                    <p className="text-sm font-medium text-gray-900">{anganwadi.supervisor?.name || 'N/A'}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded">
                     <p className="text-xs text-gray-600">Staff</p>
