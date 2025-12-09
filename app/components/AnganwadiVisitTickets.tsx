@@ -430,7 +430,7 @@ const AnganwadiVisitTickets: React.FC = () => {
             <div>
               <p className="text-sm text-red-600">{t('common.missed')}</p>
               <p className="text-2xl font-bold text-red-800">
-                {visitTickets.filter(t => t.status === 'missed').length}
+                {visitTickets.filter((t: AnganwadiVisitTicket) => t.status === 'missed').length}
               </p>
             </div>
           </div>
