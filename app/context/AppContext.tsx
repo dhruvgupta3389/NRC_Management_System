@@ -160,8 +160,8 @@ export interface AnganwadiVisitTicket {
   reportedDate?: string;
   escalationLevel?: string;
   coverageAreas?: string[];
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface AppContextType {
