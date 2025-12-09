@@ -1214,6 +1214,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     visitTickets,
     loadAnganwadis,
     loadWorkers,
+    addAnganwadi,
+    addWorker,
     addVisitTicket,
     updateVisitTicket,
     loading,
