@@ -11,13 +11,13 @@ const AnganwadiVisitTickets: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'scheduled' | 'in_progress' | 'completed' | 'missed' | 'cancelled'>('all');
   const [filterAnganwadi, setFilterAnganwadi] = useState<string>('all');
 
-  const filteredTickets = visitTickets.filter(ticket => {
+  const filteredTickets = visitTickets.filter((ticket: AnganwadiVisitTicket) => {
     const matchesStatus = filterStatus === 'all' || ticket.status === filterStatus;
-    const matchesAnganwadi = filterAnganwadi === 'all' || ticket.anganwadiId === filterAnganwadi;
+    const matchesAnganwadi = filterAnganwadi === 'all' || ticket.anganwadi_id === filterAnganwadi;
     return matchesStatus && matchesAnganwadi;
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'scheduled': return 'bg-blue-100 text-blue-800';
       case 'in_progress': return 'bg-yellow-100 text-yellow-800';
@@ -28,7 +28,7 @@ const AnganwadiVisitTickets: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string): JSX.Element => {
     switch (status) {
       case 'scheduled': return <Clock className="w-4 h-4 text-blue-600" />;
       case 'in_progress': return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
@@ -39,7 +39,7 @@ const AnganwadiVisitTickets: React.FC = () => {
     }
   };
 
-  const getVisitTypeColor = (type: string) => {
+  const getVisitTypeColor = (type: string): string => {
     switch (type) {
       case 'routine_checkup': return 'bg-blue-100 text-blue-800';
       case 'nutrition_survey': return 'bg-green-100 text-green-800';
@@ -63,8 +63,8 @@ const AnganwadiVisitTickets: React.FC = () => {
       reportedBy: 'SUPERVISOR001',
     });
 
-    const selectedAnganwadi = anganwadis.find(a => a.id === formData.anganwadiId);
-    const availableWorkers = workers.filter(w => w.anganwadiId === formData.anganwadiId && w.is_active);
+    const selectedAnganwadi = anganwadis.find((a) => a.id === formData.anganwadiId);
+    const availableWorkers = workers.filter((w) => w.anganwadi_id === formData.anganwadiId && w.is_active);
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -118,7 +118,7 @@ const AnganwadiVisitTickets: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">{t('ticket.anganwadi')}</option>
-                  {anganwadis.map(anganwadi => (
+                  {anganwadis.map((anganwadi) => (
                     <option key={anganwadi.id} value={anganwadi.id}>
                       {anganwadi.name} - {anganwadi.location.area}
                     </option>
@@ -135,7 +135,7 @@ const AnganwadiVisitTickets: React.FC = () => {
                   disabled={!formData.anganwadiId}
                 >
                   <option value="">{t('ticket.worker')}</option>
-                  {availableWorkers.map(worker => (
+                  {availableWorkers.map((worker) => (
                     <option key={worker.id} value={worker.id}>
                       {worker.name} ({t(`worker.${worker.role}`)})
                     </option>
@@ -172,7 +172,7 @@ const AnganwadiVisitTickets: React.FC = () => {
                   disabled={!selectedAnganwadi}
                 >
                   <option value="">{t('ticket.assignedArea')}</option>
-                  {selectedAnganwadi?.coverageAreas.map((area: string) => (
+                  {selectedAnganwadi?.coverageAreas.map((area: any) => (
                     <option key={area} value={area}>{area}</option>
                   ))}
                 </select>
