@@ -76,7 +76,7 @@ const BedCoordination: React.FC = () => {
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Bed {bed.number}</h3>
+                <h3 className="font-semibold text-gray-900">Bed {bed.bed_number}</h3>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   bed.status === 'available' ? 'bg-green-100 text-green-800' :
                   bed.status === 'occupied' ? 'bg-red-100 text-red-800' :

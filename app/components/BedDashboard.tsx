@@ -167,16 +167,16 @@ const BedDashboard: React.FC = () => {
                     <div>
                       <h4 className="font-medium text-gray-900">{patient?.name}</h4>
                       <p className="text-sm text-gray-600">
-                        {request.urgencyLevel} urgency • {request.estimatedStayDuration} days • {patient?.type === 'child' ? 'Pediatric' : 'Maternity'} ward
+                        {request.urgency_level} urgency • {request.estimated_stay_duration} days • {patient?.type === 'child' ? 'Pediatric' : 'Maternity'} ward
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-gray-600">
-                      {new Date(request.requestDate).toLocaleDateString()}
+                      {new Date(request.request_date).toLocaleDateString()}
                     </span>
                     <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
-                      {request.urgencyLevel}
+                      {request.urgency_level}
                     </span>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ const BedDashboard: React.FC = () => {
                     <Bed className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Bed {bed.number}</h3>
+                    <h3 className="font-semibold text-gray-900">Bed {bed.bed_number}</h3>
                     <p className="text-sm text-gray-600">{bed.ward} Ward</p>
                   </div>
                 </div>
@@ -245,10 +245,10 @@ const BedDashboard: React.FC = () => {
               <div className="flex space-x-2">
                 {bed.status === 'occupied' && (
                   <button
-                    onClick={() => updateBed(bed.id, { 
-                      status: 'available', 
-                      patientId: undefined, 
-                      admissionDate: undefined 
+                    onClick={() => updateBed(bed.id, {
+                      status: 'available',
+                      patient_id: undefined,
+                      admission_date: undefined
                     })}
                     className="flex-1 bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors text-sm"
                   >

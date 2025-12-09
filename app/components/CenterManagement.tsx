@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { MapPin, Plus, Users, Phone, Calendar, Building, CheckCircle, XCircle, Eye } from 'lucide-react';
-import { useApp, Anganwadi } from '../context/AppContext';
+import { useApp, Anganwadi, AnganwadiWorker } from '../context/AppContext';
 
 const CenterManagement: React.FC = () => {
   const { anganwadis, workers, addAnganwadi, t } = useApp();
@@ -10,7 +10,7 @@ const CenterManagement: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const getAnganwadiWorkers = (anganwadiId: string) => {
-    return workers.filter(worker => worker.anganwadiId === anganwadiId && worker.is_active);
+    return workers.filter((worker: AnganwadiWorker) => worker.anganwadi_id === anganwadiId && worker.is_active);
   };
 
   const AnganwadiDetailsModal = ({ anganwadi }: { anganwadi: Anganwadi }) => {

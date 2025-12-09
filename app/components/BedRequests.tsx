@@ -17,7 +17,7 @@ const BedRequests: React.FC = () => {
 
   const filteredRequests = bedRequests.filter(request => {
     const matchesStatus = filterStatus === 'all' || request.status === filterStatus;
-    const matchesUrgency = filterUrgency === 'all' || request.urgencyLevel === filterUrgency;
+    const matchesUrgency = filterUrgency === 'all' || request.urgency_level === filterUrgency;
     return matchesStatus && matchesUrgency;
   });
 
@@ -63,15 +63,12 @@ const BedRequests: React.FC = () => {
     if (availableBed) {
       updateBedRequest(requestId, {
         status: 'approved',
-        reviewedBy: 'Dr. Supervisor',
-        reviewDate: new Date().toISOString().split('T')[0],
-        reviewComments: `Approved for ${request.estimatedStayDuration} days. Bed ${availableBed.number} assigned.`,
       });
 
       updateBed(availableBed.id, {
         status: 'occupied',
-        patientId: request.patient_id,
-        admissionDate: new Date().toISOString().split('T')[0],
+        patient_id: request.patient_id,
+        admission_date: new Date().toISOString().split('T')[0],
       });
     }
   };
@@ -79,9 +76,6 @@ const BedRequests: React.FC = () => {
   const handleDecline = (requestId: string, reason: string, referToHospital: boolean = false) => {
     const updates: Partial<BedRequest> = {
       status: 'declined',
-      reviewedBy: 'Dr. Supervisor',
-      reviewDate: new Date().toISOString().split('T')[0],
-      reviewComments: reason,
     };
 
     if (referToHospital) {
@@ -90,7 +84,6 @@ const BedRequests: React.FC = () => {
         contactNumber: '+91 612-2234567',
         referralReason: reason,
         referralDate: new Date().toISOString().split('T')[0],
-        urgencyLevel: 'urgent',
       };
     }
 
@@ -105,7 +98,6 @@ const BedRequests: React.FC = () => {
       hospitalName: 'District Hospital Patna',
       contactNumber: '+91 612-2234567',
       referralReason: '',
-      urgencyLevel: 'urgent' as 'routine' | 'urgent' | 'emergency',
     });
 
     const handleApproveRequest = () => {
@@ -130,9 +122,6 @@ const BedRequests: React.FC = () => {
       
       const updates: Partial<BedRequest> = {
         status: 'declined',
-        reviewedBy: 'Dr. Supervisor',
-        reviewDate: new Date().toISOString().split('T')[0],
-        reviewComments,
         hospitalReferral: {
           ...hospitalData,
           referralDate: new Date().toISOString().split('T')[0],
@@ -183,17 +172,17 @@ const BedRequests: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Request Date:</span>
-                    <span className="text-sm font-medium">{new Date(request.requestDate).toLocaleDateString()}</span>
+                    <span className="text-sm font-medium">{new Date(request.request_date).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">{t('bed.urgencyLevel')}:</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgencyLevel)}`}>
-                      {t(`urgency.${request.urgencyLevel}`)}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgency_level)}`}>
+                      {t(`urgency.${request.urgency_level}`)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">{t('bed.estimatedStay')}:</span>
-                    <span className="text-sm font-medium">{request.estimatedStayDuration} days</span>
+                    <span className="text-sm font-medium">{request.estimated_stay_duration} days</span>
                   </div>
                 </div>
               </div>
@@ -456,7 +445,7 @@ const BedRequests: React.FC = () => {
             <div>
               <p className="text-sm text-orange-600">{t('urgency.critical')}</p>
               <p className="text-2xl font-bold text-orange-800">
-                {bedRequests.filter(r => r.urgencyLevel === 'critical').length}
+                {bedRequests.filter(r => r.urgency_level === 'critical').length}
               </p>
             </div>
           </div>
@@ -492,8 +481,8 @@ const BedRequests: React.FC = () => {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
                       {t(`common.${request.status}`)}
                     </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgencyLevel)}`}>
-                      {t(`urgency.${request.urgencyLevel}`)}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getUrgencyColor(request.urgency_level)}`}>
+                      {t(`urgency.${request.urgency_level}`)}
                     </span>
                     <button
                       onClick={() => setSelectedRequest(request)}
@@ -508,9 +497,9 @@ const BedRequests: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Request Details</h4>
                     <div className="space-y-1 text-sm text-gray-600">
-                      <div>Requested by: {request.requestedBy}</div>
-                      <div>{t('common.date')}: {new Date(request.requestDate).toLocaleDateString()}</div>
-                      <div>Duration: {request.estimatedStayDuration} days</div>
+                      <div>Requested by: {request.requested_by}</div>
+                      <div>{t('common.date')}: {new Date(request.request_date).toLocaleDateString()}</div>
+                      <div>Duration: {request.estimated_stay_duration} days</div>
                     </div>
                   </div>
                   <div>

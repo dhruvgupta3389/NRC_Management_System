@@ -21,6 +21,7 @@ export interface Patient {
   type: 'child' | 'pregnant_woman' | 'lactating_mother';
   pregnancy_week?: number;
   contact_number: string;
+  contactNumber?: string;
   emergency_contact?: string;
   address: string;
   weight?: number;
@@ -96,7 +97,8 @@ export interface BedRequest {
   special_requirements?: string;
   requested_by: string;
   request_date: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'declined';
+  hospitalReferral?: { hospitalName: string; contactNumber: string; referralReason: string; referralDate: string };
   created_at: string;
   updated_at: string;
 }
@@ -114,6 +116,52 @@ export interface TreatmentTracker {
   lab_reports: Array<{ date: string; type: string; results: string }>;
   created_at: string;
   updated_at: string;
+}
+
+export interface Anganwadi {
+  id: string;
+  name: string;
+  location: { area: string; district: string };
+  contact_number?: string;
+  supervisor_id?: string;
+  supervisor?: { id: string; name: string };
+  is_active: boolean;
+  capacity?: { pregnantWomen: number; children: number };
+  facilities?: string[];
+  coverageAreas?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnganwadiWorker {
+  id: string;
+  name: string;
+  employee_id: string;
+  anganwadi_id?: string;
+  role: string;
+  contact_number?: string;
+  contactNumber?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnganwadiVisitTicket {
+  id: string;
+  anganwadiId: string;
+  workerId: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  visitType: string;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'missed' | 'cancelled';
+  assignedArea: string;
+  targetBeneficiaries: { pregnantWomen: number; children: number };
+  reportedBy?: string;
+  reportedDate?: string;
+  escalationLevel?: string;
+  coverageAreas?: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface AppContextType {
@@ -161,6 +209,17 @@ interface AppContextType {
   loadTreatmentTrackers: (patientId?: string) => Promise<void>;
   addTreatmentTracker: (tracker: Omit<TreatmentTracker, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   updateTreatmentTracker: (id: string, updates: Partial<TreatmentTracker>) => Promise<void>;
+
+  // Anganwadi Management
+  anganwadis: Anganwadi[];
+  workers: AnganwadiWorker[];
+  visitTickets: AnganwadiVisitTicket[];
+  loadAnganwadis: () => Promise<void>;
+  loadWorkers: () => Promise<void>;
+  addAnganwadi: (anganwadi: Omit<Anganwadi, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addWorker: (worker: Omit<AnganwadiWorker, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addVisitTicket: (ticket: Omit<AnganwadiVisitTicket, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateVisitTicket: (id: string, updates: Partial<AnganwadiVisitTicket>) => Promise<void>;
 
   loading: boolean;
   error: string | null;
@@ -227,6 +286,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [visits, setVisits] = useState<Visit[]>([]);
   const [bedRequests, setBedRequests] = useState<BedRequest[]>([]);
   const [treatmentTrackers, setTreatmentTrackers] = useState<TreatmentTracker[]>([]);
+  const [anganwadis, setAnganwadis] = useState<Anganwadi[]>([]);
+  const [workers, setWorkers] = useState<AnganwadiWorker[]>([]);
+  const [visitTickets, setVisitTickets] = useState<AnganwadiVisitTicket[]>([]);
 
   // Translation function
   const t = (key: string, params?: Record<string, string | number>): string => {
@@ -887,6 +949,215 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  // Anganwadi Operations
+  const loadAnganwadis = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/anganwadis');
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load anganwadis');
+      }
+
+      setAnganwadis(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading anganwadis';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadWorkers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/workers');
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load workers');
+      }
+
+      setWorkers(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading workers';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addAnganwadi = async (anganwadi: Omit<Anganwadi, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/anganwadis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(anganwadi)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add anganwadi');
+      }
+
+      setAnganwadis([...anganwadis, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding anganwadi';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const addWorker = async (worker: Omit<AnganwadiWorker, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/workers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(worker)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add worker');
+      }
+
+      setWorkers([...workers, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding worker';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const addVisitTicket = async (ticket: Omit<AnganwadiVisitTicket, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const response = await fetch('/api/visit-tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ticket)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add visit ticket');
+      }
+
+      setVisitTickets([...visitTickets, data]);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error adding visit ticket';
+      setError(message);
+      throw err;
+    }
+  };
+
+  const updateVisitTicket = async (id: string, updates: Partial<AnganwadiVisitTicket>) => {
+    try {
+      const response = await fetch(`/api/visit-tickets/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update visit ticket');
+      }
+
+      setVisitTickets(visitTickets.map(ticket => ticket.id === id ? data : ticket));
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error updating visit ticket';
+      setError(message);
+      throw err;
+    }
+  };
+
   // Load current user from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
@@ -938,6 +1209,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadTreatmentTrackers,
     addTreatmentTracker,
     updateTreatmentTracker,
+    anganwadis,
+    workers,
+    visitTickets,
+    loadAnganwadis,
+    loadWorkers,
+    addAnganwadi,
+    addWorker,
+    addVisitTicket,
+    updateVisitTicket,
     loading,
     error
   };

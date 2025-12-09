@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Building, Users, Activity, MapPin } from 'lucide-react';
-import { useApp } from '../context/AppContext';
+import { useApp, Anganwadi, AnganwadiWorker } from '../context/AppContext';
 
 const AnganwadiManagement: React.FC = () => {
   const { anganwadis, workers } = useApp();
@@ -11,7 +11,7 @@ const AnganwadiManagement: React.FC = () => {
     // loadAnganwadis and loadWorkers endpoints not yet implemented
   }, []);
 
-  const activeAnganwadis = anganwadis.filter(a => a.is_active);
+  const activeAnganwadis = anganwadis.filter((a: Anganwadi) => a.is_active);
 
   return (
     <div className="space-y-6">
@@ -50,8 +50,8 @@ const AnganwadiManagement: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {activeAnganwadis.map(anganwadi => {
-          const staffCount = workers.filter(w => w.anganwadiId === anganwadi.id).length;
+        {activeAnganwadis.map((anganwadi: Anganwadi) => {
+          const staffCount = workers.filter((w: AnganwadiWorker) => w.anganwadi_id === anganwadi.id).length;
           
           return (
             <div key={anganwadi.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -69,7 +69,7 @@ const AnganwadiManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gray-50 p-3 rounded">
                     <p className="text-xs text-gray-600">Supervisor</p>
-                    <p className="text-sm font-medium text-gray-900">{anganwadi.supervisor.name}</p>
+                    <p className="text-sm font-medium text-gray-900">{anganwadi.supervisor?.name || 'N/A'}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded">
                     <p className="text-xs text-gray-600">Staff</p>
@@ -80,15 +80,15 @@ const AnganwadiManagement: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-pink-50 p-3 rounded">
                     <p className="text-xs text-pink-600 font-medium">Pregnant Women</p>
-                    <p className="text-lg font-bold text-pink-800">{anganwadi.capacity.pregnantWomen}</p>
+                    <p className="text-lg font-bold text-pink-800">{anganwadi.capacity?.pregnantWomen || 0}</p>
                   </div>
                   <div className="bg-blue-50 p-3 rounded">
                     <p className="text-xs text-blue-600 font-medium">Children</p>
-                    <p className="text-lg font-bold text-blue-800">{anganwadi.capacity.children}</p>
+                    <p className="text-lg font-bold text-blue-800">{anganwadi.capacity?.children || 0}</p>
                   </div>
                 </div>
 
-                {anganwadi.facilities.length > 0 && (
+                {anganwadi.facilities && anganwadi.facilities.length > 0 && (
                   <div>
                     <p className="text-xs font-medium text-gray-700 mb-2">Facilities</p>
                     <div className="flex flex-wrap gap-1">
@@ -97,7 +97,7 @@ const AnganwadiManagement: React.FC = () => {
                           {facility}
                         </span>
                       ))}
-                      {anganwadi.facilities.length > 2 && (
+                      {anganwadi.facilities && anganwadi.facilities.length > 2 && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
                           +{anganwadi.facilities.length - 2} more
                         </span>

@@ -68,7 +68,7 @@ export const BedAvailability = () => {
           <tbody>
             {beds.map(bed => (
               <tr key={bed.id} className="border-b border-gray-200">
-                <td className="px-6 py-4 font-medium">{bed.number}</td>
+                <td className="px-6 py-4 font-medium">{bed.bed_number}</td>
                 <td className="px-6 py-4">{bed.ward}</td>
                 <td className="px-6 py-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
