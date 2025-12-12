@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import { FileText, Plus, Search, Calendar, User, Heart, Thermometer, Activity } from 'lucide-react';
-import { useApp, SurveyReport } from '../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const SurveyReports: React.FC = () => {
-  const { surveys, patients, addSurvey, t } = useApp();
+  const { patients, t } = useApp();
+  const surveys: any[] = [];
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<string>('all');
