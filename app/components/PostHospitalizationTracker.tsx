@@ -178,7 +178,7 @@ const PostHospitalizationTracker: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Treatment Plan</h4>
               <div className="flex flex-wrap gap-2">
-                {tracker.treatmentPlan.map((treatment: string, index: number) => (
+                {tracker.treatment_plan.map((treatment: string, index: number) => (
                   <span key={index} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                     {treatment}
                   </span>
@@ -189,7 +189,7 @@ const PostHospitalizationTracker: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Daily Progress</h4>
               <div className="space-y-3">
-                {tracker.dailyProgress.map((progress: any, index: number) => (
+                {tracker.daily_progress.map((progress: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">{new Date(progress.date).toLocaleDateString()}</span>
@@ -210,11 +210,11 @@ const PostHospitalizationTracker: React.FC = () => {
               </div>
             </div>
 
-            {tracker.doctorRemarks.length > 0 && (
+            {tracker.doctor_remarks.length > 0 && (
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Doctor Remarks</h4>
                 <div className="flex flex-wrap gap-2">
-                  {tracker.doctorRemarks.map((remark: string, index: number) => (
+                  {tracker.doctor_remarks.map((remark: string, index: number) => (
                     <span key={index} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
                       {remark}
                     </span>
@@ -318,7 +318,7 @@ const PostHospitalizationTracker: React.FC = () => {
         ) : (
           treatmentTrackers.map(tracker => {
             const patient = patients.find(p => p.id === tracker.patient_id);
-            const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
+            const latestProgress = tracker.daily_progress[tracker.daily_progress.length - 1];
             
             return (
               <div key={tracker.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -383,14 +383,14 @@ const PostHospitalizationTracker: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Treatment Plan</h4>
                     <div className="flex flex-wrap gap-1">
-                      {tracker.treatmentPlan.slice(0, 2).map((treatment: string, index: number) => (
+                      {tracker.treatment_plan.slice(0, 2).map((treatment: string, index: number) => (
                         <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
                           {treatment}
                         </span>
                       ))}
-                      {tracker.treatmentPlan.length > 2 && (
+                      {tracker.treatment_plan.length > 2 && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                          +{tracker.treatmentPlan.length - 2} more
+                          +{tracker.treatment_plan.length - 2} more
                         </span>
                       )}
                     </div>
