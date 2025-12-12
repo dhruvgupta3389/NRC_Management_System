@@ -36,7 +36,7 @@ const VisitScheduling: React.FC = () => {
     return matchesDate && matchesStatus;
   });
 
-  const missedVisits = visits.filter(visit => visit.status === 'missed');
+  const missedVisits = visits.filter(visit => visit.status === 'cancelled');
 
   const handleMarkMissed = (visitId: string) => {
     // updateVisit call commented out
@@ -112,7 +112,7 @@ const VisitScheduling: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patient_id}
+                value={formData.patientId}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
@@ -304,7 +304,7 @@ const VisitScheduling: React.FC = () => {
                         )}
                       </div>
                       <div className="flex space-x-2">
-                        {visit.status === 'scheduled' && (
+                        {visit.status === 'pending' && (
                           <>
                             <button
                               onClick={() => updateVisit(visit.id, { 
@@ -324,7 +324,7 @@ const VisitScheduling: React.FC = () => {
                             </button>
                           </>
                         )}
-                        {visit.status === 'missed' && (
+                        {visit.status === 'cancelled' && (
                           <div className="flex space-x-2">
                             <button
                               onClick={() => updateVisit(visit.id, { status: 'rescheduled' })}
