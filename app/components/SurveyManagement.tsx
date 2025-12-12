@@ -42,17 +42,7 @@ const SurveyManagement: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      addSurvey({
-        ...formData,
-        date: new Date().toISOString().split('T')[0],
-        nutritionData: {
-          appetite: formData.appetite,
-          foodIntake: formData.foodIntake,
-          supplements: formData.supplements.split(',').map(s => s.trim()).filter(s => s),
-        },
-        symptoms: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
-        recommendations: formData.recommendations.split(',').map(r => r.trim()).filter(r => r),
-      });
+      // Survey functionality not yet implemented in context
       setShowAddForm(false);
       setFormData({
         patientId: '',
