@@ -5,7 +5,7 @@ import { Calendar, Clock, CheckCircle, XCircle, AlertTriangle, Plus, Search, Tic
 import { useApp, Visit } from '../context/AppContext';
 
 const VisitScheduling: React.FC = () => {
-  const { visits, patients, addVisit, updateVisit, addMissedVisitTicket, t } = useApp();
+  const { visits, patients, loadVisits, t } = useApp();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'scheduled' | 'completed' | 'missed'>('all');
