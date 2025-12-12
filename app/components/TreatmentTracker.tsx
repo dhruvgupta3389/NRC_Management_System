@@ -11,8 +11,8 @@ const TreatmentTracker: React.FC = () => {
     loadPatients();
   }, []);
 
-  const activeTrackers = treatmentTrackers.filter(t => !t.dischargeDate);
-  const completedTrackers = treatmentTrackers.filter(t => t.dischargeDate);
+  const activeTrackers = treatmentTrackers.filter(t => !t.discharge_date);
+  const completedTrackers = treatmentTrackers.filter(t => t.discharge_date);
 
   return (
     <div className="space-y-6">
@@ -55,7 +55,7 @@ const TreatmentTracker: React.FC = () => {
         <div className="space-y-4">
           {activeTrackers.map(tracker => {
             const patient = patients.find(p => p.id === tracker.patient_id);
-            const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
+            const latestProgress = tracker.daily_progress[tracker.daily_progress.length - 1];
             const duration = Math.ceil((new Date().getTime() - new Date(tracker.admission_date).getTime()) / (1000 * 60 * 60 * 24));
 
             return (
@@ -75,14 +75,14 @@ const TreatmentTracker: React.FC = () => {
                 <div>
                   <span className="text-xs font-medium text-gray-600">Treatment Plan:</span>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {tracker.treatmentPlan.slice(0, 3).map((treatment: string, idx: number) => (
+                    {tracker.treatment_plan.slice(0, 3).map((treatment: string, idx: number) => (
                       <span key={idx} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
                         {treatment}
                       </span>
                     ))}
-                    {tracker.treatmentPlan.length > 3 && (
+                    {tracker.treatment_plan.length > 3 && (
                       <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                        +{tracker.treatmentPlan.length - 3}
+                        +{tracker.treatment_plan.length - 3}
                       </span>
                     )}
                   </div>
