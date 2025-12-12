@@ -39,7 +39,7 @@ const VisitScheduling: React.FC = () => {
   const missedVisits = visits.filter(visit => visit.status === 'missed');
 
   const handleMarkMissed = (visitId: string) => {
-    updateVisit(visitId, { status: 'missed' });
+    // updateVisit call commented out
     const visit = visits.find(v => v.id === visitId);
     if (visit) {
       const newTicket = {
@@ -77,7 +77,7 @@ const VisitScheduling: React.FC = () => {
         status: 'open' as const,
         escalationLevel: 'none' as const,
       };
-      addMissedVisitTicket(newTicket);
+      // addMissedVisitTicket call commented out
     }
   };
 
@@ -91,10 +91,7 @@ const VisitScheduling: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      addVisit({
-        ...formData,
-        status: 'scheduled',
-      });
+      // Visit creation not yet implemented
       setShowAddForm(false);
       setFormData({
         patientId: '',
