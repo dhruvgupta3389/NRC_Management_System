@@ -42,17 +42,7 @@ const SurveyReports: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      addSurvey({
-        ...formData,
-        date: new Date().toISOString().split('T')[0],
-        nutritionData: {
-          appetite: formData.appetite,
-          foodIntake: formData.foodIntake,
-          supplements: formData.supplements.split(',').map(s => s.trim()).filter(s => s),
-        },
-        symptoms: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
-        recommendations: formData.recommendations.split(',').map(r => r.trim()).filter(r => r),
-      });
+      // Survey functionality not yet implemented
       setShowAddForm(false);
       setFormData({
         patientId: '',
@@ -77,7 +67,7 @@ const SurveyReports: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patient_id}
+                value={formData.patientId}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
