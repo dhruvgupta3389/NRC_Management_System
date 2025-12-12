@@ -15,74 +15,73 @@ const PatientRegistration: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    aadhaarNumber: '',
+    aadhaar_number: '',
     age: '',
-    type: 'child' as 'child' | 'pregnant',
-    pregnancyWeek: '',
-    contactNumber: '',
+    type: 'child' as 'child' | 'pregnant_woman',
+    pregnancy_week: '',
+    contact_number: '',
     address: '',
     weight: '',
     height: '',
-    bloodPressure: '',
+    blood_pressure: '',
     temperature: '',
     symptoms: '',
     documents: '',
     photos: '',
     remarks: '',
-    nutritionStatus: 'severely_malnourished' as 'normal' | 'malnourished' | 'severely_malnourished'
+    nutrition_status: 'severely_malnourished' as 'normal' | 'malnourished' | 'severely_malnourished'
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newPatient: Omit<Patient, 'id' | 'registrationNumber' | 'admissionDate'> = {
+    const newPatient: Omit<Patient, 'id' | 'registration_number' | 'created_at' | 'updated_at'> = {
       name: formData.name,
-      aadhaarNumber: formData.aadhaar_number,
+      aadhaar_number: formData.aadhaar_number || undefined,
       age: parseInt(formData.age),
-      type: formData.type,
-      pregnancyWeek: formData.pregnancyWeek ? parseInt(formData.pregnancyWeek) : undefined,
-      contactNumber: formData.contactNumber,
+      type: formData.type as 'child' | 'pregnant_woman' | 'lactating_mother',
+      pregnancy_week: formData.pregnancy_week ? parseInt(formData.pregnancy_week) : undefined,
+      contact_number: formData.contact_number,
       address: formData.address,
-      weight: parseFloat(formData.weight),
-      height: parseFloat(formData.height),
-      bloodPressure: formData.blood_pressure || undefined,
+      weight: parseFloat(formData.weight) || undefined,
+      height: parseFloat(formData.height) || undefined,
+      blood_pressure: formData.blood_pressure || undefined,
       temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
-      symptoms: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
-      documents: formData.documents.split(',').map(d => d.trim()).filter(d => d),
-      photos: formData.photos.split(',').map(p => p.trim()).filter(p => p),
-      remarks: formData.remarks,
-      nutritionStatus: formData.nutrition_status,
-      medicalHistory: [],
-      registrationDate: new Date().toISOString().split('T')[0],
-      registeredBy: currentUser?.employee_id || 'SYSTEM',
-      riskScore: formData.nutrition_status === 'severely_malnourished' ? 85 :
+      medical_history: [],
+      symbols: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
+      remarks: formData.remarks || undefined,
+      nutrition_status: formData.nutrition_status,
+      risk_score: formData.nutrition_status === 'severely_malnourished' ? 85 :
                  formData.nutrition_status === 'malnourished' ? 60 : 30,
-      nutritionalDeficiency: formData.nutrition_status === 'severely_malnourished' ?
+      nutritional_deficiency: formData.nutrition_status === 'severely_malnourished' ?
                            ['Protein', 'Iron', 'Vitamin D'] :
                            formData.nutrition_status === 'malnourished' ?
                            ['Iron', 'Vitamin D'] : [],
-      nextVisit: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      registration_date: new Date().toISOString().split('T')[0],
+      registered_by: currentUser?.id,
+      is_active: true,
+      next_visit_date: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
 
     addPatient(newPatient);
     setShowAddForm(false);
     setFormData({
       name: '',
-      aadhaarNumber: '',
+      aadhaar_number: '',
       age: '',
       type: 'child',
-      pregnancyWeek: '',
-      contactNumber: '',
+      pregnancy_week: '',
+      contact_number: '',
       address: '',
       weight: '',
       height: '',
-      bloodPressure: '',
+      blood_pressure: '',
       temperature: '',
       symptoms: '',
       documents: '',
       photos: '',
       remarks: '',
-      nutritionStatus: 'severely_malnourished'
+      nutrition_status: 'severely_malnourished'
     });
   };
 
