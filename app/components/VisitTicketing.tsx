@@ -432,13 +432,11 @@ const VisitTicketing: React.FC = () => {
                       {ticket.status === 'open' && (
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => // updateMissedVisitTicket call commented out}
                             className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
                           >
                             Start Progress
                           </button>
                           <button
-                            onClick={() => // updateMissedVisitTicket call commented out}
                             className="text-green-600 hover:text-green-800 text-sm font-medium"
                           >
                             Resolve
@@ -447,7 +445,6 @@ const VisitTicketing: React.FC = () => {
                       )}
                       {ticket.status === 'in_progress' && (
                         <button
-                          onClick={() => // updateMissedVisitTicket call commented out}
                           className="text-green-600 hover:text-green-800 text-sm font-medium"
                         >
                           Mark Resolved
