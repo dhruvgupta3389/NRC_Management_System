@@ -31,7 +31,7 @@ const VisitScheduling: React.FC = () => {
   };
 
   const filteredVisits = visits.filter(visit => {
-    const matchesDate = visit.scheduledDate === selectedDate;
+    const matchesDate = visit.scheduled_date === selectedDate;
     const matchesStatus = filterStatus === 'all' || visit.status === filterStatus;
     return matchesDate && matchesStatus;
   });
@@ -46,7 +46,7 @@ const VisitScheduling: React.FC = () => {
         patientId: visit.patient_id,
         visitId: visitId,
         dateReported: new Date().toISOString().split('T')[0],
-        reportedBy: visit.healthWorkerId,
+        reportedBy: "HW001",
         missedConditions: {
           patientNotAvailable: true,
           patientRefused: false,
@@ -128,7 +128,7 @@ const VisitScheduling: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('visit.scheduledDate')}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('visit.scheduled_date')}</label>
               <input
                 type="date"
                 required
@@ -138,7 +138,7 @@ const VisitScheduling: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('visit.healthWorkerId')}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('"HW001"')}</label>
               <input
                 type="text"
                 required
@@ -236,7 +236,7 @@ const VisitScheduling: React.FC = () => {
                   <div>
                     <span className="font-medium text-red-800">{patient?.name}</span>
                     <span className="text-sm text-red-600 ml-2">
-                      {t('visit.missed')} on {new Date(visit.scheduledDate).toLocaleDateString()}
+                      {t('visit.missed')} on {new Date(visit.scheduled_date).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex space-x-2">
@@ -299,10 +299,10 @@ const VisitScheduling: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{t('visit.healthWorker')}: {visit.healthWorkerId}</p>
-                        {visit.actualDate && (
+                        <p className="text-sm font-medium text-gray-900">{t('visit.healthWorker')}: {"HW001"}</p>
+                        {"" && (
                           <p className="text-sm text-gray-600">
-                            {t('visit.completedOn', { date: new Date(visit.actualDate).toLocaleDateString() })}
+                            {t('visit.completedOn', { date: new Date("").toLocaleDateString() })}
                           </p>
                         )}
                       </div>
