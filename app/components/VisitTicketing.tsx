@@ -87,7 +87,7 @@ const VisitTicketing: React.FC = () => {
         escalationLevel: 'none',
       };
 
-      addMissedVisitTicket(newTicket);
+      // addMissedVisitTicket call commented out
       setShowCreateForm(false);
     };
 
@@ -432,13 +432,13 @@ const VisitTicketing: React.FC = () => {
                       {ticket.status === 'open' && (
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => updateMissedVisitTicket(ticket.id, { status: 'in_progress' })}
+                            onClick={() => // updateMissedVisitTicket call commented out}
                             className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
                           >
                             Start Progress
                           </button>
                           <button
-                            onClick={() => updateMissedVisitTicket(ticket.id, { status: 'resolved' })}
+                            onClick={() => // updateMissedVisitTicket call commented out}
                             className="text-green-600 hover:text-green-800 text-sm font-medium"
                           >
                             Resolve
@@ -447,7 +447,7 @@ const VisitTicketing: React.FC = () => {
                       )}
                       {ticket.status === 'in_progress' && (
                         <button
-                          onClick={() => updateMissedVisitTicket(ticket.id, { status: 'resolved' })}
+                          onClick={() => // updateMissedVisitTicket call commented out}
                           className="text-green-600 hover:text-green-800 text-sm font-medium"
                         >
                           Mark Resolved
