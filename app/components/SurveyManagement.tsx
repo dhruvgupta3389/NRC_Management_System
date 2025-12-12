@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import { FileText, Plus, Search, Calendar, User, Heart, Thermometer, Activity } from 'lucide-react';
-import { useApp, SurveyReport } from '../context/AppContext';
+import { useApp } from '../context/AppContext';
 
 const SurveyManagement: React.FC = () => {
-  const { surveys, patients, addSurvey, t } = useApp();
+  const { patients, t } = useApp();
+  const surveys: any[] = [];
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<string>('all');
@@ -76,7 +77,7 @@ const SurveyManagement: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patient_id}
+                value={formData.patientId}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
