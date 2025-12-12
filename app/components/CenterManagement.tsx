@@ -186,9 +186,16 @@ const CenterManagement: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       
+      const supervisorObj = formData.supervisorName ? {
+        id: Math.random().toString(36).substr(2, 9),
+        name: formData.supervisorName,
+        contactNumber: formData.supervisorContact || undefined,
+        employeeId: formData.supervisorEmployeeId || undefined,
+      } : undefined;
+
       const newAnganwadi: Omit<Anganwadi, 'id'> = {
         name: formData.name,
-        code: formData.code,
+        code: formData.code || undefined,
         location: {
           area: formData.locationArea,
           district: formData.locationDistrict,
@@ -199,19 +206,15 @@ const CenterManagement: React.FC = () => {
             longitude: parseFloat(formData.longitude) || 0,
           },
         },
-        supervisor: {
-          name: formData.supervisorName,
-          contactNumber: formData.supervisorContact,
-          employeeId: formData.supervisorEmployeeId,
-        },
+        ...(supervisorObj && { supervisor: supervisorObj }),
         capacity: {
           pregnantWomen: parseInt(formData.capacityPregnantWomen) || 0,
           children: parseInt(formData.capacityChildren) || 0,
         },
         facilities: formData.facilities.split(',').map(f => f.trim()).filter(f => f),
         coverageAreas: formData.coverageAreas.split(',').map(a => a.trim()).filter(a => a),
-        establishedDate: formData.establishedDate,
-        isActive: true,
+        establishedDate: formData.establishedDate || undefined,
+        is_active: true,
       };
 
       addAnganwadi(newAnganwadi);
