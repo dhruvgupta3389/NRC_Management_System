@@ -223,7 +223,7 @@ const PostHospitalizationTracker: React.FC = () => {
               </div>
             )}
 
-            {tracker.dischargeSummary && (
+            {false && // dischargeSummary not available (
               <div className="bg-green-50 p-4 rounded-lg">
                 <h4 className="font-medium text-green-900 mb-3">Discharge Summary</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -397,7 +397,7 @@ const PostHospitalizationTracker: React.FC = () => {
                   </div>
                 </div>
 
-                {tracker.dischargeSummary && (
+                {false && // dischargeSummary not available (
                   <div className="mt-4 p-3 bg-green-50 rounded-md">
                     <div className="flex items-center space-x-2 mb-2">
                       <CheckCircle className="w-4 h-4 text-green-600" />
