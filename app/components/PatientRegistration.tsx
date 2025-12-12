@@ -17,7 +17,7 @@ const PatientRegistration: React.FC = () => {
     name: '',
     aadhaar_number: '',
     age: '',
-    type: 'child' as 'child' | 'pregnant_woman',
+    type: 'child' as 'child' | 'pregnant_woman' | 'lactating_mother',
     pregnancy_week: '',
     contact_number: '',
     address: '',
@@ -390,7 +390,7 @@ const PatientRegistration: React.FC = () => {
                       type="text"
                       placeholder="120/80"
                       value={formData.blood_pressure}
-                      onChange={(e) => setFormData({...formData, bloodPressure: e.target.value})}
+                      onChange={(e) => setFormData({...formData, blood_pressure: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -398,7 +398,7 @@ const PatientRegistration: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nutrition Status *</label>
                     <select
                       value={formData.nutrition_status}
-                      onChange={(e) => setFormData({...formData, nutritionStatus: e.target.value as any})}
+                      onChange={(e) => setFormData({...formData, nutrition_status: e.target.value as 'normal' | 'malnourished' | 'severely_malnourished'})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="severely_malnourished">Severely Malnourished (SAM)</option>
