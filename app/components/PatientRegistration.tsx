@@ -48,7 +48,7 @@ const PatientRegistration: React.FC = () => {
       blood_pressure: formData.blood_pressure || undefined,
       temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
       medical_history: [],
-      symbols: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
+      symptoms: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
       remarks: formData.remarks || undefined,
       nutrition_status: formData.nutrition_status,
       risk_score: formData.nutrition_status === 'severely_malnourished' ? 85 :
