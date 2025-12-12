@@ -193,7 +193,7 @@ const CenterManagement: React.FC = () => {
         employeeId: formData.supervisorEmployeeId || undefined,
       } : undefined;
 
-      const newAnganwadi: Omit<Anganwadi, 'id'> = {
+      const newAnganwadi: Omit<Anganwadi, 'id' | 'created_at' | 'updated_at'> = {
         name: formData.name,
         code: formData.code || undefined,
         location: {
