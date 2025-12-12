@@ -63,7 +63,7 @@ const VisitTicketing: React.FC = () => {
       e.preventDefault();
       
       const newTicket: Omit<MissedVisitTicket, 'id'> = {
-        patientId: formData.patient_id,
+        patientId: formData.patientId,
         visitId: formData.visitId,
         dateReported: new Date().toISOString().split('T')[0],
         reportedBy: formData.reportedBy,
@@ -102,7 +102,7 @@ const VisitTicketing: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('patient.patient')}</label>
               <select
                 required
-                value={formData.patient_id}
+                value={formData.patientId}
                 onChange={(e) => setFormData({...formData, patientId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
