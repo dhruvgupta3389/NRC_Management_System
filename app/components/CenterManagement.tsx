@@ -43,27 +43,31 @@ const CenterManagement: React.FC = () => {
                     <MapPin className="w-4 h-4 text-blue-600" />
                     <span>{anganwadi.location.area}, {anganwadi.location.district}</span>
                   </div>
-                  <div><span className="font-medium">State:</span> {anganwadi.location.state}</div>
-                  <div><span className="font-medium">Pincode:</span> {anganwadi.location.pincode}</div>
-                  <div><span className="font-medium">Coordinates:</span> {anganwadi.location.coordinates.latitude}, {anganwadi.location.coordinates.longitude}</div>
+                  {anganwadi.location.state && <div><span className="font-medium">State:</span> {anganwadi.location.state}</div>}
+                  {anganwadi.location.pincode && <div><span className="font-medium">Pincode:</span> {anganwadi.location.pincode}</div>}
+                  {anganwadi.location.coordinates && <div><span className="font-medium">Coordinates:</span> {anganwadi.location.coordinates.latitude}, {anganwadi.location.coordinates.longitude}</div>}
                 </div>
               </div>
               
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Supervisor Information</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">{t('common.name')}:</span> {anganwadi.supervisor.name}</div>
-                  <div className="flex items-center space-x-2">
-                    <Phone className="w-4 h-4 text-green-600" />
-                    <span>{anganwadi.supervisor.contactNumber}</span>
-                  </div>
-                  <div><span className="font-medium">Employee ID:</span> {anganwadi.supervisor.employeeId}</div>
+                  {anganwadi.supervisor && (
+                    <>
+                      <div><span className="font-medium">{t('common.name')}:</span> {anganwadi.supervisor.name}</div>
+                      {anganwadi.supervisor.contactNumber && <div className="flex items-center space-x-2">
+                        <Phone className="w-4 h-4 text-green-600" />
+                        <span>{anganwadi.supervisor.contactNumber}</span>
+                      </div>}
+                      {anganwadi.supervisor.employeeId && <div><span className="font-medium">Employee ID:</span> {anganwadi.supervisor.employeeId}</div>}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              {anganwadi.capacity && <div>
                 <h4 className="font-medium text-gray-900 mb-3">Capacity</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-pink-50 p-3 rounded-lg">
@@ -75,7 +79,7 @@ const CenterManagement: React.FC = () => {
                     <div className="text-sm text-blue-600">Children</div>
                   </div>
                 </div>
-              </div>
+              </div>}
               
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Coverage Areas</h4>
@@ -89,7 +93,7 @@ const CenterManagement: React.FC = () => {
               </div>
             </div>
 
-            <div>
+            {anganwadi.facilities && anganwadi.facilities.length > 0 && <div>
               <h4 className="font-medium text-gray-900 mb-3">Facilities</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {anganwadi.facilities.map((facility: string, index: number) => (
@@ -99,7 +103,7 @@ const CenterManagement: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div>}
 
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Assigned Workers ({anganwadiWorkers.length})</h4>
@@ -112,14 +116,14 @@ const CenterManagement: React.FC = () => {
                       </div>
                       <div>
                         <div className="font-medium">{worker.name}</div>
-                        <div className="text-sm text-gray-600">{t(`worker.${worker.role}`)} • {worker.employeeId}</div>
+                        <div className="text-sm text-gray-600">{t(`worker.${worker.role}`)} • {worker.employee_id}</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium">{worker.contactNumber}</div>
-                      <div className="text-xs text-gray-500">
-                        {worker.workingHours.start} - {worker.workingHours.end}
-                      </div>
+                      {worker.contact_number && <div className="text-sm font-medium">{worker.contact_number}</div>}
+                      {worker.workingHours && <div className="text-xs text-gray-500">
+                        {worker.workingHours}
+                      </div>}
                     </div>
                   </div>
                 ))}
@@ -129,10 +133,14 @@ const CenterManagement: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Establishment</h4>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm">{new Date(anganwadi.establishedDate).toLocaleDateString()}</span>
-                </div>
+                {anganwadi.establishedDate ? (
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm">{new Date(anganwadi.establishedDate).toLocaleDateString()}</span>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">Not specified</div>
+                )}
               </div>
               
               <div>
