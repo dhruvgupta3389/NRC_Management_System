@@ -70,7 +70,7 @@ const AnganwadiVisitTickets: React.FC = () => {
       e.preventDefault();
       
       const newTicket: Omit<AnganwadiVisitTicket, 'id'> = {
-        anganwadiId: formData.anganwadiId,
+        anganwadi_id: formData.anganwadiId,
         workerId: formData.workerId,
         scheduledDate: formData.scheduledDate,
         scheduledTime: formData.scheduledTime,
@@ -241,7 +241,7 @@ const AnganwadiVisitTickets: React.FC = () => {
   };
 
   const TicketDetailsModal = ({ ticket }: { ticket: AnganwadiVisitTicket }) => {
-    const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadiId);
+    const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadi_id);
     const worker = workers.find((w: AnganwadiWorker) => w.id === ticket.workerId);
 
     return (
@@ -454,7 +454,7 @@ const AnganwadiVisitTickets: React.FC = () => {
           </div>
         ) : (
           filteredTickets.map((ticket: AnganwadiVisitTicket) => {
-            const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadiId);
+            const anganwadi = anganwadis.find((a: Anganwadi) => a.id === ticket.anganwadi_id);
             const worker = workers.find((w: AnganwadiWorker) => w.id === ticket.workerId);
             
             return (

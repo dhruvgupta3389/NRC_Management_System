@@ -98,6 +98,7 @@ const BedRequests: React.FC = () => {
       hospitalName: 'District Hospital Patna',
       contactNumber: '+91 612-2234567',
       referralReason: '',
+      urgencyLevel: 'routine',
     });
 
     const handleApproveRequest = () => {
@@ -168,7 +169,7 @@ const BedRequests: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Requested By:</span>
-                    <span className="text-sm font-medium">{request.requestedBy}</span>
+                    <span className="text-sm font-medium">{request.requested_by}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Request Date:</span>
@@ -209,14 +210,14 @@ const BedRequests: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">{t('bed.medicalJustification')}</h4>
               <div className="p-3 bg-blue-50 rounded-md">
-                <p className="text-sm text-blue-800">{request.medicalJustification}</p>
+                <p className="text-sm text-blue-800">{request.medical_justification}</p>
               </div>
             </div>
 
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Current Condition</h4>
               <div className="p-3 bg-yellow-50 rounded-md">
-                <p className="text-sm text-yellow-800">{request.currentCondition}</p>
+                <p className="text-sm text-yellow-800">{request.current_condition}</p>
               </div>
             </div>
 
@@ -504,7 +505,7 @@ const BedRequests: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Medical Justification</h4>
-                    <p className="text-sm text-gray-600 line-clamp-3">{request.medicalJustification}</p>
+                    <p className="text-sm text-gray-600 line-clamp-3">{request.medical_justification}</p>
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">{t('common.actions')}</h4>

@@ -98,7 +98,10 @@ export interface BedRequest {
   requested_by: string;
   request_date: string;
   status: 'pending' | 'approved' | 'rejected' | 'declined';
-  hospitalReferral?: { hospitalName: string; contactNumber: string; referralReason: string; referralDate: string };
+  hospitalReferral?: { hospitalName: string; contactNumber: string; referralReason: string; referralDate: string; urgencyLevel?: string };
+  reviewedBy?: string;
+  reviewDate?: string;
+  reviewComments?: string;
   created_at: string;
   updated_at: string;
 }
@@ -121,14 +124,16 @@ export interface TreatmentTracker {
 export interface Anganwadi {
   id: string;
   name: string;
-  location: { area: string; district: string };
+  code?: string;
+  location: { area: string; district: string; state?: string; pincode?: string; coordinates?: { latitude: number; longitude: number } };
   contact_number?: string;
   supervisor_id?: string;
-  supervisor?: { id: string; name: string };
+  supervisor?: { id: string; name: string; contactNumber?: string; employeeId?: string };
   is_active: boolean;
   capacity?: { pregnantWomen: number; children: number };
   facilities?: string[];
   coverageAreas?: string[];
+  establishedDate?: string;
   created_at: string;
   updated_at: string;
 }
@@ -141,6 +146,7 @@ export interface AnganwadiWorker {
   role: string;
   contact_number?: string;
   contactNumber?: string;
+  workingHours?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -148,7 +154,7 @@ export interface AnganwadiWorker {
 
 export interface AnganwadiVisitTicket {
   id: string;
-  anganwadiId: string;
+  anganwadi_id: string;
   workerId: string;
   scheduledDate: string;
   scheduledTime: string;

@@ -15,9 +15,9 @@ const Notifications: React.FC = () => {
 
   const filteredNotifications = notifications.filter(notification => {
     const matchesType = filterType === 'all' || notification.type === filterType;
-    const matchesRead = filterRead === 'all' || 
-                       (filterRead === 'read' && notification.read) ||
-                       (filterRead === 'unread' && !notification.read);
+    const matchesRead = filterRead === 'all' ||
+                       (filterRead === 'read' && notification.is_read) ||
+                       (filterRead === 'unread' && !notification.is_read);
     return matchesType && matchesRead;
   });
 
@@ -164,7 +164,7 @@ const Notifications: React.FC = () => {
             <div
               key={notification.id}
               className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all hover:shadow-md ${
-                !notification.read ? 'border-l-4 border-l-blue-500' : ''
+                !notification.is_read ? 'border-l-4 border-l-blue-500' : ''
               }`}
             >
               <div className="flex items-start justify-between">
@@ -174,7 +174,7 @@ const Notifications: React.FC = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className={`font-semibold ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                      <h3 className={`font-semibold ${!notification.is_read ? 'text-gray-900' : 'text-gray-700'}`}>
                         {notification.title}
                       </h3>
                       <div className={`w-2 h-2 rounded-full ${getPriorityColor(notification.priority)}`}></div>
@@ -187,17 +187,17 @@ const Notifications: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <p className={`text-sm ${!notification.read ? 'text-gray-800' : 'text-gray-600'} mb-3`}>
+                    <p className={`text-sm ${!notification.is_read ? 'text-gray-800' : 'text-gray-600'} mb-3`}>
                       {notification.message}
                     </p>
                     <div className="flex items-center space-x-4 text-xs text-gray-500">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-3 h-3" />
-                        <span>{new Date(notification.date).toLocaleDateString()}</span>
+                        <span>{new Date(notification.created_at).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <User className="w-3 h-3" />
-                        <span>{notification.userRole}</span>
+                        <span>{notification.user_role}</span>
                       </div>
                       {notification.priority === 'critical' && (
                         <div className="flex items-center space-x-1 text-red-600">
@@ -209,7 +209,7 @@ const Notifications: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {!notification.read && (
+                  {!notification.is_read && (
                     <button
                       onClick={() => markNotificationRead(notification.id)}
                       className="text-blue-600 hover:text-blue-800 transition-colors"
@@ -219,8 +219,8 @@ const Notifications: React.FC = () => {
                     </button>
                   )}
                   <div className="text-right">
-                    <div className={`text-xs ${!notification.read ? 'font-medium text-blue-600' : 'text-gray-500'}`}>
-                      {!notification.read ? 'Unread' : 'Read'}
+                    <div className={`text-xs ${!notification.is_read ? 'font-medium text-blue-600' : 'text-gray-500'}`}>
+                      {!notification.is_read ? 'Unread' : 'Read'}
                     </div>
                   </div>
                 </div>
