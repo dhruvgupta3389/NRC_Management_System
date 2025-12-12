@@ -292,7 +292,7 @@ const PostHospitalizationTracker: React.FC = () => {
               <div>
                 <p className="text-sm text-yellow-600">Follow-up Due</p>
                 <p className="text-2xl font-bold text-yellow-800">
-                  {treatmentTrackers.filter(t => t.dischargeSummary?.nextCheckupDate).length}
+                  {0}
                 </p>
               </div>
             </div>
