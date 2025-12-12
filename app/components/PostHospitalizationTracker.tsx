@@ -223,23 +223,20 @@ const PostHospitalizationTracker: React.FC = () => {
               </div>
             )}
 
-            {false && // dischargeSummary not available (
+            {false && (
               <div className="bg-green-50 p-4 rounded-lg">
                 <h4 className="font-medium text-green-900 mb-3">Discharge Summary</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div><span className="font-medium">Final Weight:</span> "Not available" kg</div>
-                  <div><span className="font-medium">Next Checkup:</span> {new Date(tracker.dischargeSummary.nextCheckupDate).toLocaleDateString()}</div>
+                  <div><span className="font-medium">Final Weight:</span> Not available</div>
+                  <div><span className="font-medium">Next Checkup:</span> Not available</div>
                 </div>
                 <div className="mt-3">
                   <span className="font-medium">Health Improvement:</span>
-                  <p className="text-sm mt-1">"Not available"</p>
+                  <p className="text-sm mt-1">Not available</p>
                 </div>
                 <div className="mt-3">
                   <span className="font-medium">Follow-up Instructions:</span>
                   <ul className="list-disc list-inside text-sm mt-1">
-                    {tracker.dischargeSummary.followUpInstructions.map((instruction: string, index: number) => (
-                      <li key={index}>{instruction}</li>
-                    ))}
                   </ul>
                 </div>
               </div>
@@ -397,15 +394,15 @@ const PostHospitalizationTracker: React.FC = () => {
                   </div>
                 </div>
 
-                {false && // dischargeSummary not available (
+                {false && (
                   <div className="mt-4 p-3 bg-green-50 rounded-md">
                     <div className="flex items-center space-x-2 mb-2">
                       <CheckCircle className="w-4 h-4 text-green-600" />
                       <span className="font-medium text-green-800">Discharge Summary Available</span>
                     </div>
-                    <p className="text-sm text-green-700">"Not available"</p>
+                    <p className="text-sm text-green-700">Not available</p>
                     <div className="text-xs text-green-600 mt-1">
-                      Next checkup: {new Date(tracker.dischargeSummary.nextCheckupDate).toLocaleDateString()}
+                      Next checkup: Not available
                     </div>
                   </div>
                 )}
