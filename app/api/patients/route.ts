@@ -104,6 +104,8 @@ export async function POST(request: NextRequest) {
       nutrition_status: body.nutritionStatus,
       medical_history: body.medicalHistory || [],
       symptoms: body.symptoms || [],
+      documents: body.documents || [],
+      photos: body.photos || [],
       remarks: body.remarks,
       risk_score: body.riskScore || 0,
       nutritional_deficiency: body.nutritionalDeficiency || [],

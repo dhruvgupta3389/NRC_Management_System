@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, User, Baby, Heart, FileText, Camera, Upload, AlertTriangle } from 'lucide-react';
+import { Plus, Search, User, Baby, Heart, AlertTriangle } from 'lucide-react';
 import { useApp, Patient } from '../context/AppContext';
+import DocumentUpload, { DocumentItem } from './DocumentUpload';
+import PhotoUpload, { PhotoItem } from './PhotoUpload';
 
 const PatientRegistration: React.FC = () => {
   const { patients, addPatient, currentUser, loadPatients, t } = useApp();
@@ -26,16 +28,18 @@ const PatientRegistration: React.FC = () => {
     blood_pressure: '',
     temperature: '',
     symptoms: '',
-    documents: '',
-    photos: '',
     remarks: '',
     nutrition_status: 'severely_malnourished' as 'normal' | 'malnourished' | 'severely_malnourished'
   });
 
+  // Separate state for uploaded files
+  const [uploadedDocuments, setUploadedDocuments] = useState<DocumentItem[]>([]);
+  const [uploadedPhotos, setUploadedPhotos] = useState<PhotoItem[]>([]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newPatient: Omit<Patient, 'id' | 'registration_number' | 'created_at' | 'updated_at'> = {
+    const newPatient: Omit<Patient, 'id' | 'registration_number' | 'created_at' | 'updated_at'> & { documents?: any[]; photos?: any[] } = {
       name: formData.name,
       aadhaar_number: formData.aadhaar_number || undefined,
       age: parseInt(formData.age),
@@ -49,14 +53,16 @@ const PatientRegistration: React.FC = () => {
       temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
       medical_history: [],
       symptoms: formData.symptoms.split(',').map(s => s.trim()).filter(s => s),
+      documents: uploadedDocuments,
+      photos: uploadedPhotos,
       remarks: formData.remarks || undefined,
       nutrition_status: formData.nutrition_status,
       risk_score: formData.nutrition_status === 'severely_malnourished' ? 85 :
-                 formData.nutrition_status === 'malnourished' ? 60 : 30,
+        formData.nutrition_status === 'malnourished' ? 60 : 30,
       nutritional_deficiency: formData.nutrition_status === 'severely_malnourished' ?
-                           ['Protein', 'Iron', 'Vitamin D'] :
-                           formData.nutrition_status === 'malnourished' ?
-                           ['Iron', 'Vitamin D'] : [],
+        ['Protein', 'Iron', 'Vitamin D'] :
+        formData.nutrition_status === 'malnourished' ?
+          ['Iron', 'Vitamin D'] : [],
       registration_date: new Date().toISOString().split('T')[0],
       registered_by: currentUser?.id,
       is_active: true,
@@ -78,11 +84,11 @@ const PatientRegistration: React.FC = () => {
       blood_pressure: '',
       temperature: '',
       symptoms: '',
-      documents: '',
-      photos: '',
       remarks: '',
       nutrition_status: 'severely_malnourished'
     });
+    setUploadedDocuments([]);
+    setUploadedPhotos([]);
   };
 
   const filteredPatients = patients.filter(patient =>
@@ -207,8 +213,8 @@ const PatientRegistration: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patient.nutrition_status)}`}>
-                      {patient.nutrition_status === 'severely_malnourished' ? 'SAM' : 
-                       patient.nutrition_status === 'malnourished' ? 'MAM' : 'Normal'}
+                      {patient.nutrition_status === 'severely_malnourished' ? 'SAM' :
+                        patient.nutrition_status === 'malnourished' ? 'MAM' : 'Normal'}
                     </span>
                     {patient.risk_score && (
                       <div className={`mt-1 px-2 py-1 rounded-full text-xs font-medium ${getRiskScoreColor(patient.risk_score)}`}>
@@ -222,7 +228,7 @@ const PatientRegistration: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               {patient.symptoms && patient.symptoms.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm font-medium text-gray-700 mb-2">Symptoms:</p>
@@ -276,7 +282,7 @@ const PatientRegistration: React.FC = () => {
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -288,7 +294,7 @@ const PatientRegistration: React.FC = () => {
                       pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}"
                       placeholder="1234-5678-9012"
                       value={formData.aadhaar_number}
-                      onChange={(e) => setFormData({...formData, aadhaar_number: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, aadhaar_number: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -298,7 +304,7 @@ const PatientRegistration: React.FC = () => {
                       type="number"
                       required
                       value={formData.age}
-                      onChange={(e) => setFormData({...formData, age: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -306,7 +312,7 @@ const PatientRegistration: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
                     <select
                       value={formData.type}
-                      onChange={(e) => setFormData({...formData, type: e.target.value as 'child' | 'pregnant_woman' | 'lactating_mother'})}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value as 'child' | 'pregnant_woman' | 'lactating_mother' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="child">Child</option>
@@ -322,7 +328,7 @@ const PatientRegistration: React.FC = () => {
                         min="1"
                         max="42"
                         value={formData.pregnancy_week}
-                        onChange={(e) => setFormData({...formData, pregnancy_week: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, pregnancy_week: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       />
                     </div>
@@ -333,7 +339,7 @@ const PatientRegistration: React.FC = () => {
                       type="tel"
                       required
                       value={formData.contact_number}
-                      onChange={(e) => setFormData({...formData, contact_number: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -343,7 +349,7 @@ const PatientRegistration: React.FC = () => {
                   <textarea
                     required
                     value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     rows={2}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
@@ -360,7 +366,7 @@ const PatientRegistration: React.FC = () => {
                       step="0.1"
                       required
                       value={formData.weight}
-                      onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -370,7 +376,7 @@ const PatientRegistration: React.FC = () => {
                       type="number"
                       required
                       value={formData.height}
-                      onChange={(e) => setFormData({...formData, height: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -380,7 +386,7 @@ const PatientRegistration: React.FC = () => {
                       type="number"
                       step="0.1"
                       value={formData.temperature}
-                      onChange={(e) => setFormData({...formData, temperature: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, temperature: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -390,7 +396,7 @@ const PatientRegistration: React.FC = () => {
                       type="text"
                       placeholder="120/80"
                       value={formData.blood_pressure}
-                      onChange={(e) => setFormData({...formData, blood_pressure: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, blood_pressure: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -398,7 +404,7 @@ const PatientRegistration: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nutrition Status *</label>
                     <select
                       value={formData.nutrition_status}
-                      onChange={(e) => setFormData({...formData, nutrition_status: e.target.value as 'normal' | 'malnourished' | 'severely_malnourished'})}
+                      onChange={(e) => setFormData({ ...formData, nutrition_status: e.target.value as 'normal' | 'malnourished' | 'severely_malnourished' })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="severely_malnourished">Severely Malnourished (SAM)</option>
@@ -413,7 +419,7 @@ const PatientRegistration: React.FC = () => {
                     type="text"
                     placeholder="Weakness, Loss of appetite, Frequent infections"
                     value={formData.symptoms}
-                    onChange={(e) => setFormData({...formData, symptoms: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, symptoms: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
                 </div>
@@ -421,25 +427,23 @@ const PatientRegistration: React.FC = () => {
 
               <div>
                 <h4 className="text-md font-medium text-gray-900 mb-4">Documents & Photos</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Documents (comma separated)</label>
-                    <input
-                      type="text"
-                      placeholder="Aadhaar Card, Birth Certificate"
-                      value={formData.documents}
-                      onChange={(e) => setFormData({...formData, documents: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Document Upload Section */}
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <DocumentUpload
+                      documents={uploadedDocuments}
+                      onDocumentsChange={setUploadedDocuments}
+                      patientId="temp"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Photos (comma separated)</label>
-                    <input
-                      type="text"
-                      placeholder="patient_photo.jpg, growth_chart.jpg"
-                      value={formData.photos}
-                      onChange={(e) => setFormData({...formData, photos: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+
+                  {/* Photo Upload Section */}
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <PhotoUpload
+                      photos={uploadedPhotos}
+                      onPhotosChange={setUploadedPhotos}
+                      patientId="temp"
+                      maxPhotos={5}
                     />
                   </div>
                 </div>
@@ -447,7 +451,7 @@ const PatientRegistration: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
                   <textarea
                     value={formData.remarks}
-                    onChange={(e) => setFormData({...formData, remarks: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
                     rows={3}
                     placeholder="Additional observations and notes..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"

@@ -427,6 +427,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           nutritionStatus: patient.nutrition_status,
           medicalHistory: patient.medical_history || [],
           symptoms: patient.symptoms || [],
+          documents: (patient as any).documents || [],
+          photos: (patient as any).photos || [],
           remarks: patient.remarks,
           riskScore: patient.risk_score,
           nutritionalDeficiency: patient.nutritional_deficiency || [],
