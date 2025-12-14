@@ -25,12 +25,16 @@ export async function PATCH(
       updated_at: new Date().toISOString()
     };
 
-    // Map camelCase properties to snake_case
+    // Support both camelCase and snake_case property names
     if (body.status !== undefined) updateData.status = body.status;
     if (body.reviewedBy !== undefined) updateData.reviewed_by = body.reviewedBy;
+    if (body.reviewed_by !== undefined) updateData.reviewed_by = body.reviewed_by;
     if (body.reviewDate !== undefined) updateData.review_date = body.reviewDate;
+    if (body.review_date !== undefined) updateData.review_date = body.review_date;
     if (body.reviewComments !== undefined) updateData.review_comments = body.reviewComments;
+    if (body.review_comments !== undefined) updateData.review_comments = body.review_comments;
     if (body.hospitalReferral !== undefined) updateData.hospital_referral = body.hospitalReferral;
+    if (body.hospital_referral !== undefined) updateData.hospital_referral = body.hospital_referral;
 
     const { data: result, error } = await supabase
       .from('bed_requests')
