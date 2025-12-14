@@ -81,17 +81,18 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+    // Support both camelCase and snake_case property names
     const bedRequestData = {
-      patient_id: body.patientId,
-      urgency_level: body.urgencyLevel,
-      medical_justification: body.medicalJustification,
-      current_condition: body.currentCondition,
-      estimated_stay_duration: body.estimatedStayDuration,
-      special_requirements: body.specialRequirements || null,
-      requested_by: body.requestedBy,
-      request_date: body.requestDate,
+      patient_id: body.patientId || body.patient_id,
+      urgency_level: body.urgencyLevel || body.urgency_level,
+      medical_justification: body.medicalJustification || body.medical_justification,
+      current_condition: body.currentCondition || body.current_condition,
+      estimated_stay_duration: body.estimatedStayDuration || body.estimated_stay_duration,
+      special_requirements: body.specialRequirements || body.special_requirements || null,
+      requested_by: body.requestedBy || body.requested_by,
+      request_date: body.requestDate || body.request_date,
       status: body.status || 'pending',
-      hospital_referral: body.hospitalReferral || null
+      hospital_referral: body.hospitalReferral || body.hospital_referral || null
     };
 
     const { data, error } = await supabase
