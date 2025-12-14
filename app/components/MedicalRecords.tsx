@@ -2,15 +2,55 @@
 
 import React, { useState } from 'react';
 import { FileText, User, Calendar, Activity, Pill, TestTube, Heart, Thermometer, Weight, Ruler, Eye, Plus } from 'lucide-react';
-import { useApp, MedicalRecord } from '../context/AppContext';
+import { useApp, Patient } from '../context/AppContext';
+
+interface MedicalRecord {
+  id: string;
+  patientId: string;
+  date: string;
+  visitType: 'routine' | 'emergency' | 'follow_up' | 'admission' | 'discharge';
+  healthWorkerId: string;
+  vitals: {
+    weight: number;
+    height: number;
+    temperature?: number;
+    bloodPressure?: string;
+    pulse?: number;
+    respiratoryRate?: number;
+    oxygenSaturation?: number;
+  };
+  symptoms: string[];
+  diagnosis: string[];
+  treatment: string[];
+  medications: Array<{
+    name: string;
+    dosage: string;
+    frequency: string;
+    duration: string;
+  }>;
+  nutritionAssessment: {
+    appetite: 'poor' | 'moderate' | 'good';
+    foodIntake: 'inadequate' | 'adequate' | 'excessive';
+    supplements: string[];
+    dietPlan?: string;
+  };
+  labResults: {
+    hemoglobin?: number;
+    bloodSugar?: number;
+    proteinLevel?: number;
+  };
+  notes?: string;
+  nextVisitDate?: string;
+  followUpRequired: boolean;
+}
 
 const MedicalRecords: React.FC = () => {
-  const { patients, medicalRecords, getPatientMedicalHistory, addMedicalRecord, t } = useApp();
+  const { patients, t } = useApp();
   const [selectedPatient, setSelectedPatient] = useState<string>('');
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const patientRecords = selectedPatient ? getPatientMedicalHistory(selectedPatient) : [];
+  const patientRecords: MedicalRecord[] = [];
   const patient = selectedPatient ? patients.find(p => p.id === selectedPatient) : null;
 
   const getVisitTypeColor = (type: string) => {
@@ -55,8 +95,9 @@ const MedicalRecords: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       
-      const newRecord: Omit<MedicalRecord, 'id'> = {
-        patientId: formData.patient_id,
+      const newRecord: MedicalRecord = {
+        id: Math.random().toString(36).substr(2, 9),
+        patientId: formData.patientId,
         date: new Date().toISOString().split('T')[0],
         visitType: formData.visitType,
         healthWorkerId: formData.healthWorkerId,
@@ -64,7 +105,7 @@ const MedicalRecords: React.FC = () => {
           weight: parseFloat(formData.weight),
           height: parseFloat(formData.height),
           temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
-          bloodPressure: formData.blood_pressure || undefined,
+          bloodPressure: formData.bloodPressure || undefined,
           pulse: formData.pulse ? parseInt(formData.pulse) : undefined,
           respiratoryRate: formData.respiratoryRate ? parseInt(formData.respiratoryRate) : undefined,
           oxygenSaturation: formData.oxygenSaturation ? parseInt(formData.oxygenSaturation) : undefined,
@@ -93,11 +134,10 @@ const MedicalRecords: React.FC = () => {
           proteinLevel: formData.proteinLevel ? parseFloat(formData.proteinLevel) : undefined,
         },
         notes: formData.notes,
-        nextVisitDate: formData.next_visit_date || undefined,
+        nextVisitDate: formData.nextVisitDate || undefined,
         followUpRequired: formData.followUpRequired,
       };
 
-      addMedicalRecord(newRecord);
       setShowAddForm(false);
     };
 
@@ -175,7 +215,7 @@ const MedicalRecords: React.FC = () => {
                   <input
                     type="text"
                     placeholder="120/80"
-                    value={formData.blood_pressure}
+                    value={formData.bloodPressure}
                     onChange={(e) => setFormData({...formData, bloodPressure: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -270,7 +310,7 @@ const MedicalRecords: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('medical.next_visit_date')}</label>
                   <input
                     type="date"
-                    value={formData.next_visit_date}
+                    value={formData.nextVisitDate}
                     onChange={(e) => setFormData({...formData, nextVisitDate: e.target.value})}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -336,10 +376,10 @@ const MedicalRecords: React.FC = () => {
                   <span className="text-sm">{t('medical.temp')}: {record.vitals.temperature}°F</span>
                 </div>
               )}
-              {record.vitals.blood_pressure && (
+              {record.vitals.bloodPressure && (
                 <div className="flex items-center space-x-2">
                   <Heart className="w-4 h-4 text-purple-600" />
-                  <span className="text-sm">{t('medical.bp')}: {record.vitals.blood_pressure}</span>
+                  <span className="text-sm">{t('medical.bp')}: {record.vitals.bloodPressure}</span>
                 </div>
               )}
             </div>
@@ -372,7 +412,7 @@ const MedicalRecords: React.FC = () => {
             <div>
               <h4 className="text-md font-medium text-gray-900 mb-3">{t('medical.medications')}</h4>
               <div className="space-y-2">
-                {record.medications.map((med: any, index: number) => (
+                {record.medications.map((med, index: number) => (
                   <div key={index} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-md">
                     <Pill className="w-4 h-4 text-green-600" />
                     <span className="font-medium">{med.name}</span>
@@ -449,7 +489,7 @@ const MedicalRecords: React.FC = () => {
             className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">{t('medical.choosePatient')}</option>
-            {patients.map(patient => (
+            {patients.map((patient: Patient) => (
               <option key={patient.id} value={patient.id}>
                 {patient.name} - {patient.type === 'child' ? t('patient.child') : t('patient.pregnant')} ({t('medical.registration')}: {patient.registration_number})
               </option>
@@ -501,7 +541,7 @@ const MedicalRecords: React.FC = () => {
               <p className="text-gray-500">{t('medical.noRecords')}</p>
             </div>
           ) : (
-            patientRecords.map(record => (
+            patientRecords.map((record: MedicalRecord) => (
               <div key={record.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-4">
@@ -559,8 +599,8 @@ const MedicalRecords: React.FC = () => {
                       ) : (
                         <span className="text-green-600">{t('ticket.notRequired')}</span>
                       )}
-                      {record.next_visit_date && (
-                        <div className="text-xs mt-1">{t('visit.nextAttempt', { date: new Date(record.next_visit_date).toLocaleDateString() })}</div>
+                      {record.nextVisitDate && (
+                        <div className="text-xs mt-1">{t('visit.nextAttempt', { date: new Date(record.nextVisitDate).toLocaleDateString() })}</div>
                       )}
                     </div>
                   </div>

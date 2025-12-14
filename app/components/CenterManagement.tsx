@@ -193,7 +193,7 @@ const CenterManagement: React.FC = () => {
         employeeId: formData.supervisorEmployeeId || undefined,
       } : undefined;
 
-      const newAnganwadi: Omit<Anganwadi, 'id'> = {
+      const newAnganwadi: Omit<Anganwadi, 'id' | 'created_at' | 'updated_at'> = {
         name: formData.name,
         code: formData.code || undefined,
         location: {
@@ -504,7 +504,7 @@ const CenterManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-pink-600">Total Capacity (Pregnant)</p>
                 <p className="text-2xl font-bold text-pink-800">
-                  {anganwadis.reduce((sum, a) => sum + a.capacity.pregnantWomen, 0)}
+                  {anganwadis.reduce((sum, a) => sum + (a.capacity?.pregnantWomen || 0), 0)}
                 </p>
               </div>
             </div>
@@ -515,7 +515,7 @@ const CenterManagement: React.FC = () => {
               <div>
                 <p className="text-sm text-purple-600">Total Capacity (Children)</p>
                 <p className="text-2xl font-bold text-purple-800">
-                  {anganwadis.reduce((sum, a) => sum + a.capacity.children, 0)}
+                  {anganwadis.reduce((sum, a) => sum + (a.capacity?.children || 0), 0)}
                 </p>
               </div>
             </div>
@@ -564,31 +564,37 @@ const CenterManagement: React.FC = () => {
 
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Supervisor</h4>
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                    <div>
-                      <div className="font-medium text-sm">{anganwadi.supervisor.name}</div>
-                      <div className="text-xs text-gray-600">{anganwadi.supervisor.employeeId}</div>
+                  {anganwadi.supervisor ? (
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                      <div>
+                        <div className="font-medium text-sm">{anganwadi.supervisor.name}</div>
+                        <div className="text-xs text-gray-600">{anganwadi.supervisor.employeeId}</div>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Phone className="w-3 h-3 text-gray-500" />
+                        <span className="text-xs text-gray-600">{anganwadi.supervisor.contactNumber}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <Phone className="w-3 h-3 text-gray-500" />
-                      <span className="text-xs text-gray-600">{anganwadi.supervisor.contactNumber}</span>
-                    </div>
-                  </div>
+                  ) : (
+                    <div className="text-sm text-gray-500 p-3 bg-gray-50 rounded-md">Not assigned</div>
+                  )}
                 </div>
 
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Capacity</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-pink-50 p-2 rounded-md text-center">
-                      <div className="text-lg font-bold text-pink-800">{anganwadi.capacity.pregnantWomen}</div>
-                      <div className="text-xs text-pink-600">Pregnant Women</div>
-                    </div>
-                    <div className="bg-blue-50 p-2 rounded-md text-center">
-                      <div className="text-lg font-bold text-blue-800">{anganwadi.capacity.children}</div>
-                      <div className="text-xs text-blue-600">Children</div>
+                {anganwadi.capacity && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Capacity</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-pink-50 p-2 rounded-md text-center">
+                        <div className="text-lg font-bold text-pink-800">{anganwadi.capacity.pregnantWomen}</div>
+                        <div className="text-xs text-pink-600">Pregnant Women</div>
+                      </div>
+                      <div className="bg-blue-50 p-2 rounded-md text-center">
+                        <div className="text-lg font-bold text-blue-800">{anganwadi.capacity.children}</div>
+                        <div className="text-xs text-blue-600">Children</div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-2">Workers ({anganwadiWorkers.length})</h4>

@@ -178,7 +178,7 @@ const PostHospitalizationTracker: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Treatment Plan</h4>
               <div className="flex flex-wrap gap-2">
-                {tracker.treatmentPlan.map((treatment: string, index: number) => (
+                {tracker.treatment_plan.map((treatment: string, index: number) => (
                   <span key={index} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                     {treatment}
                   </span>
@@ -189,7 +189,7 @@ const PostHospitalizationTracker: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Daily Progress</h4>
               <div className="space-y-3">
-                {tracker.dailyProgress.map((progress: any, index: number) => (
+                {tracker.daily_progress.map((progress: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900">{new Date(progress.date).toLocaleDateString()}</span>
@@ -210,11 +210,11 @@ const PostHospitalizationTracker: React.FC = () => {
               </div>
             </div>
 
-            {tracker.doctorRemarks.length > 0 && (
+            {tracker.doctor_remarks.length > 0 && (
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Doctor Remarks</h4>
                 <div className="flex flex-wrap gap-2">
-                  {tracker.doctorRemarks.map((remark: string, index: number) => (
+                  {tracker.doctor_remarks.map((remark: string, index: number) => (
                     <span key={index} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
                       {remark}
                     </span>
@@ -223,23 +223,20 @@ const PostHospitalizationTracker: React.FC = () => {
               </div>
             )}
 
-            {tracker.dischargeSummary && (
+            {false && (
               <div className="bg-green-50 p-4 rounded-lg">
                 <h4 className="font-medium text-green-900 mb-3">Discharge Summary</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div><span className="font-medium">Final Weight:</span> {tracker.dischargeSummary.finalWeight} kg</div>
-                  <div><span className="font-medium">Next Checkup:</span> {new Date(tracker.dischargeSummary.nextCheckupDate).toLocaleDateString()}</div>
+                  <div><span className="font-medium">Final Weight:</span> Not available</div>
+                  <div><span className="font-medium">Next Checkup:</span> Not available</div>
                 </div>
                 <div className="mt-3">
                   <span className="font-medium">Health Improvement:</span>
-                  <p className="text-sm mt-1">{tracker.dischargeSummary.healthImprovement}</p>
+                  <p className="text-sm mt-1">Not available</p>
                 </div>
                 <div className="mt-3">
                   <span className="font-medium">Follow-up Instructions:</span>
                   <ul className="list-disc list-inside text-sm mt-1">
-                    {tracker.dischargeSummary.followUpInstructions.map((instruction: string, index: number) => (
-                      <li key={index}>{instruction}</li>
-                    ))}
                   </ul>
                 </div>
               </div>
@@ -292,7 +289,7 @@ const PostHospitalizationTracker: React.FC = () => {
               <div>
                 <p className="text-sm text-yellow-600">Follow-up Due</p>
                 <p className="text-2xl font-bold text-yellow-800">
-                  {treatmentTrackers.filter(t => t.dischargeSummary?.nextCheckupDate).length}
+                  {0}
                 </p>
               </div>
             </div>
@@ -318,7 +315,7 @@ const PostHospitalizationTracker: React.FC = () => {
         ) : (
           treatmentTrackers.map(tracker => {
             const patient = patients.find(p => p.id === tracker.patient_id);
-            const latestProgress = tracker.dailyProgress[tracker.dailyProgress.length - 1];
+            const latestProgress = tracker.daily_progress[tracker.daily_progress.length - 1];
             
             return (
               <div key={tracker.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -383,29 +380,29 @@ const PostHospitalizationTracker: React.FC = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Treatment Plan</h4>
                     <div className="flex flex-wrap gap-1">
-                      {tracker.treatmentPlan.slice(0, 2).map((treatment: string, index: number) => (
+                      {tracker.treatment_plan.slice(0, 2).map((treatment: string, index: number) => (
                         <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
                           {treatment}
                         </span>
                       ))}
-                      {tracker.treatmentPlan.length > 2 && (
+                      {tracker.treatment_plan.length > 2 && (
                         <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                          +{tracker.treatmentPlan.length - 2} more
+                          +{tracker.treatment_plan.length - 2} more
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {tracker.dischargeSummary && (
+                {false && (
                   <div className="mt-4 p-3 bg-green-50 rounded-md">
                     <div className="flex items-center space-x-2 mb-2">
                       <CheckCircle className="w-4 h-4 text-green-600" />
                       <span className="font-medium text-green-800">Discharge Summary Available</span>
                     </div>
-                    <p className="text-sm text-green-700">{tracker.dischargeSummary.healthImprovement}</p>
+                    <p className="text-sm text-green-700">Not available</p>
                     <div className="text-xs text-green-600 mt-1">
-                      Next checkup: {new Date(tracker.dischargeSummary.nextCheckupDate).toLocaleDateString()}
+                      Next checkup: Not available
                     </div>
                   </div>
                 )}

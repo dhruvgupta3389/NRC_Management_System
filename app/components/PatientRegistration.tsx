@@ -17,7 +17,7 @@ const PatientRegistration: React.FC = () => {
     name: '',
     aadhaar_number: '',
     age: '',
-    type: 'child' as 'child' | 'pregnant_woman',
+    type: 'child' as 'child' | 'pregnant_woman' | 'lactating_mother',
     pregnancy_week: '',
     contact_number: '',
     address: '',
@@ -161,7 +161,7 @@ const PatientRegistration: React.FC = () => {
             <div>
               <p className="text-sm text-pink-600">Pregnant Women</p>
               <p className="text-2xl font-bold text-pink-800">
-                {patients.filter(p => p.type === 'pregnant').length}
+                {patients.filter(p => p.type === 'pregnant_woman').length}
               </p>
             </div>
           </div>
@@ -199,7 +199,7 @@ const PatientRegistration: React.FC = () => {
                     <h4 className="font-semibold text-gray-900">{patient.name}</h4>
                     <p className="text-sm text-gray-600">
                       {patient.type === 'child' ? 'Child' : 'Pregnant Woman'} • Age: {patient.age}
-                      {patient.pregnancyWeek && ` • ${patient.pregnancyWeek} weeks`}
+                      {patient.pregnancy_week && ` • ${patient.pregnancy_week} weeks`}
                     </p>
                     <p className="text-xs text-gray-500">Aadhaar: {patient.aadhaar_number}</p>
                   </div>
@@ -223,7 +223,7 @@ const PatientRegistration: React.FC = () => {
                 </div>
               </div>
               
-              {patient.symptoms.length > 0 && (
+              {patient.symptoms && patient.symptoms.length > 0 && (
                 <div className="mt-4">
                   <p className="text-sm font-medium text-gray-700 mb-2">Symptoms:</p>
                   <div className="flex flex-wrap gap-2">
@@ -288,7 +288,7 @@ const PatientRegistration: React.FC = () => {
                       pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}"
                       placeholder="1234-5678-9012"
                       value={formData.aadhaar_number}
-                      onChange={(e) => setFormData({...formData, aadhaarNumber: e.target.value})}
+                      onChange={(e) => setFormData({...formData, aadhaar_number: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -306,22 +306,23 @@ const PatientRegistration: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
                     <select
                       value={formData.type}
-                      onChange={(e) => setFormData({...formData, type: e.target.value as 'child' | 'pregnant'})}
+                      onChange={(e) => setFormData({...formData, type: e.target.value as 'child' | 'pregnant_woman' | 'lactating_mother'})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="child">Child</option>
-                      <option value="pregnant">Pregnant Woman</option>
+                      <option value="pregnant_woman">Pregnant Woman</option>
+                      <option value="lactating_mother">Lactating Mother</option>
                     </select>
                   </div>
-                  {formData.type === 'pregnant' && (
+                  {formData.type === 'pregnant_woman' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Pregnancy Week</label>
                       <input
                         type="number"
                         min="1"
                         max="42"
-                        value={formData.pregnancyWeek}
-                        onChange={(e) => setFormData({...formData, pregnancyWeek: e.target.value})}
+                        value={formData.pregnancy_week}
+                        onChange={(e) => setFormData({...formData, pregnancy_week: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       />
                     </div>
@@ -331,8 +332,8 @@ const PatientRegistration: React.FC = () => {
                     <input
                       type="tel"
                       required
-                      value={formData.contactNumber}
-                      onChange={(e) => setFormData({...formData, contactNumber: e.target.value})}
+                      value={formData.contact_number}
+                      onChange={(e) => setFormData({...formData, contact_number: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -389,7 +390,7 @@ const PatientRegistration: React.FC = () => {
                       type="text"
                       placeholder="120/80"
                       value={formData.blood_pressure}
-                      onChange={(e) => setFormData({...formData, bloodPressure: e.target.value})}
+                      onChange={(e) => setFormData({...formData, blood_pressure: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
@@ -397,7 +398,7 @@ const PatientRegistration: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nutrition Status *</label>
                     <select
                       value={formData.nutrition_status}
-                      onChange={(e) => setFormData({...formData, nutritionStatus: e.target.value as any})}
+                      onChange={(e) => setFormData({...formData, nutrition_status: e.target.value as 'normal' | 'malnourished' | 'severely_malnourished'})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="severely_malnourished">Severely Malnourished (SAM)</option>

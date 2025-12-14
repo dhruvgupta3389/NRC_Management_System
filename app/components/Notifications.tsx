@@ -55,8 +55,8 @@ const Notifications: React.FC = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const criticalCount = notifications.filter(n => n.priority === 'critical' && !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const criticalCount = notifications.filter(n => n.priority === 'critical' && !n.is_read).length;
 
   return (
     <div className="space-y-6">
@@ -146,7 +146,7 @@ const Notifications: React.FC = () => {
             <div>
               <p className="text-sm text-green-600">Action Required</p>
               <p className="text-2xl font-bold text-green-800">
-                {notifications.filter(n => n.action_required && !n.read).length}
+                {notifications.filter(n => n.action_required && !n.is_read).length}
               </p>
             </div>
           </div>
