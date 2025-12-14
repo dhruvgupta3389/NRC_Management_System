@@ -41,6 +41,11 @@ export interface Patient {
   registered_by?: string;
   registration_date: string;
   is_active: boolean;
+  // Discharge tracking fields
+  discharge_date?: string;
+  discharge_reason?: string;
+  last_bed_id?: string;
+  last_admission_date?: string;
   created_at: string;
   updated_at: string;
 }
@@ -95,7 +100,7 @@ export interface BedRequest {
   current_condition: string;
   estimated_stay_duration: number;
   special_requirements?: string;
-  requested_by: string;
+  requested_by?: string;
   request_date: string;
   status: 'pending' | 'approved' | 'rejected' | 'declined';
   hospitalReferral?: { hospitalName: string; contactNumber: string; referralReason: string; referralDate: string; urgencyLevel?: string };
@@ -185,9 +190,13 @@ interface AppContextType {
 
   // Patients
   patients: Patient[];
+  archivedPatients: Patient[];
   loadPatients: (registeredBy?: string) => Promise<void>;
+  loadArchivedPatients: () => Promise<void>;
   addPatient: (patient: Partial<Patient>) => Promise<Patient>;
   updatePatient: (id: string, updates: Partial<Patient>) => Promise<void>;
+  dischargePatient: (patientId: string, bedId: string, reason?: string) => Promise<void>;
+  reactivatePatient: (patientId: string, bedId?: string) => Promise<void>;
 
   // Beds
   beds: Bed[];
@@ -287,6 +296,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [error, setError] = useState<string | null>(null);
 
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [archivedPatients, setArchivedPatients] = useState<Patient[]>([]);
   const [beds, setBeds] = useState<Bed[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [visits, setVisits] = useState<Visit[]>([]);
@@ -299,13 +309,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Translation function
   const t = (key: string, params?: Record<string, string | number>): string => {
     let text = translations[language]?.[key] || translations['en']?.[key] || key;
-    
+
     if (params) {
       Object.entries(params).forEach(([paramKey, paramValue]) => {
         text = text.replace(`{${paramKey}}`, String(paramValue));
       });
     }
-    
+
     return text;
   };
 
@@ -334,7 +344,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Check access for feature
   const hasAccess = (feature: string): boolean => {
     if (!userRole) return false;
-    
+
     const roleAccess: Record<string, string[]> = {
       admin: ['all'],
       anganwadi_worker: [
@@ -348,7 +358,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       ],
       hospital: [
         'bedDashboard', 'bedRequests', 'treatmentTracker', 'admissionTracking',
-        'medicalReports', 'bedDemandPrediction', 'notifications'
+        'medicalReports', 'bedDemandPrediction', 'notifications', 'addBed',
+        'patientRegistration', 'medicalRecords', 'dischargedPatients', 'releaseBed'
       ]
     };
 
@@ -513,6 +524,201 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setError(null);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error updating patient';
+      setError(message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load archived (discharged) patients
+  const loadArchivedPatients = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/patients?isActive=false');
+
+      let data: any = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText);
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read response body:', readError);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load archived patients');
+      }
+
+      setArchivedPatients(data.data || []);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error loading archived patients';
+      setError(message);
+      console.error(message, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Discharge patient - marks patient as inactive and sets bed to maintenance
+  const dischargePatient = async (patientId: string, bedId: string, reason?: string) => {
+    try {
+      setLoading(true);
+      console.log('🏥 dischargePatient called:', { patientId, bedId, reason });
+
+      // Update patient: set is_active to false, clear bed_id, set discharge info
+      const patientResponse = await fetch(`/api/patients/${patientId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isActive: false,
+          bedId: null,
+          dischargeDate: new Date().toISOString(),
+          dischargeReason: reason || 'Discharged',
+          lastBedId: bedId || null,
+        }),
+      });
+
+      console.log('👤 Patient update response:', patientResponse.status, patientResponse.ok);
+
+      if (!patientResponse.ok) {
+        const errorText = await patientResponse.text();
+        console.error('❌ Patient update failed:', errorText);
+        throw new Error('Failed to update patient discharge status');
+      }
+
+      // Update bed: set status to maintenance and clear patient reference (only if bedId exists)
+      if (bedId && bedId.trim() !== '') {
+        console.log('🛏️ Updating bed:', bedId);
+        const bedResponse = await fetch(`/api/beds/${bedId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'maintenance',
+            patient_id: null,
+            admission_date: null,
+          }),
+        });
+
+        console.log('🛏️ Bed update response:', bedResponse.status, bedResponse.ok);
+
+        if (!bedResponse.ok) {
+          const errorText = await bedResponse.text();
+          console.warn(`Failed to update bed ${bedId}:`, errorText);
+        } else {
+          console.log('✅ Bed updated to maintenance');
+        }
+      } else {
+        console.log('⚠️ No bedId provided, skipping bed update');
+      }
+
+      // Update local state
+      const dischargedPatient = patients.find(p => p.id === patientId);
+      if (dischargedPatient) {
+        setPatients(patients.filter(p => p.id !== patientId));
+        setArchivedPatients([...archivedPatients, {
+          ...dischargedPatient,
+          is_active: false,
+          discharge_date: new Date().toISOString(),
+          discharge_reason: reason || 'Discharged',
+          last_bed_id: bedId,
+          bed_id: undefined
+        }]);
+      }
+
+      // Update bed in local state
+      setBeds(beds.map(b => b.id === bedId ? {
+        ...b,
+        status: 'maintenance',
+        patient_id: undefined,
+        admission_date: undefined,
+      } : b));
+
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error discharging patient';
+      setError(message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reactivate patient - marks patient as active and optionally assigns a bed
+  const reactivatePatient = async (patientId: string, bedId?: string) => {
+    try {
+      setLoading(true);
+
+      // Update patient: set is_active to true
+      const patientPayload: any = {
+        isActive: true,
+        dischargeDate: null,
+        dischargeReason: null,
+      };
+
+      if (bedId) {
+        patientPayload.bedId = bedId;
+        patientPayload.lastAdmissionDate = new Date().toISOString().split('T')[0];
+      }
+
+      const patientResponse = await fetch(`/api/patients/${patientId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientPayload),
+      });
+
+      if (!patientResponse.ok) {
+        throw new Error('Failed to reactivate patient');
+      }
+
+      // If a bed is assigned, update the bed status
+      if (bedId) {
+        const patient = archivedPatients.find(p => p.id === patientId);
+        const bedResponse = await fetch(`/api/beds/${bedId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'occupied',
+            patient_id: patientId,
+            admission_date: new Date().toISOString().split('T')[0],
+          }),
+        });
+
+        if (!bedResponse.ok) {
+          throw new Error('Failed to update bed status');
+        }
+
+        // Update bed in local state
+        setBeds(beds.map(b => b.id === bedId ? {
+          ...b,
+          status: 'occupied',
+          patient_id: patientId,
+          admission_date: new Date().toISOString().split('T')[0],
+        } : b));
+      }
+
+      // Move patient from archived to active
+      const reactivatedPatient = archivedPatients.find(p => p.id === patientId);
+      if (reactivatedPatient) {
+        setArchivedPatients(archivedPatients.filter(p => p.id !== patientId));
+        setPatients([...patients, {
+          ...reactivatedPatient,
+          is_active: true,
+          discharge_date: undefined,
+          discharge_reason: undefined,
+          bed_id: bedId,
+        }]);
+      }
+
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error reactivating patient';
       setError(message);
       throw err;
     } finally {
@@ -1195,9 +1401,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     logout,
     hasAccess,
     patients,
+    archivedPatients,
     loadPatients,
+    loadArchivedPatients,
     addPatient,
     updatePatient,
+    dischargePatient,
+    reactivatePatient,
     beds,
     loadBeds,
     updateBed,

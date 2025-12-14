@@ -5,7 +5,7 @@ import { Bed, Plus, CheckCircle, XCircle, AlertTriangle, Clock, User, Calendar, 
 import { useApp, BedRequest } from '../context/AppContext';
 
 const BedAvailability: React.FC = () => {
-  const { beds, patients, bedRequests, addBedRequest, updateBedRequest, loadBeds, loadPatients, t } = useApp();
+  const { beds, patients, bedRequests, addBedRequest, updateBedRequest, loadBeds, loadPatients, addNotification, currentUser, t } = useApp();
 
   useEffect(() => {
     loadBeds();
@@ -14,9 +14,19 @@ const BedAvailability: React.FC = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [selectedBed, setSelectedBed] = useState<string>('');
 
+  // Patient Leaving Notification State
+  const [showLeavingModal, setShowLeavingModal] = useState(false);
+  const [leavingPatientId, setLeavingPatientId] = useState('');
+  const [leavingReason, setLeavingReason] = useState('');
+  const [isNotifying, setIsNotifying] = useState(false);
+  const [notifySuccess, setNotifySuccess] = useState(false);
+
   const availableBeds = beds.filter(bed => bed.status === 'available');
   const occupiedBeds = beds.filter(bed => bed.status === 'occupied');
   const maintenanceBeds = beds.filter(bed => bed.status === 'maintenance');
+
+  // Get patients who have beds assigned (admitted patients)
+  const admittedPatients = patients.filter(p => p.bed_id);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,6 +46,40 @@ const BedAvailability: React.FC = () => {
     }
   };
 
+  // Handle patient leaving notification
+  const handleNotifyLeaving = async () => {
+    if (!leavingPatientId) return;
+
+    const patient = patients.find(p => p.id === leavingPatientId);
+    if (!patient) return;
+
+    setIsNotifying(true);
+    try {
+      // Create notification for hospital staff
+      await addNotification({
+        user_role: 'hospital',
+        type: 'patient_discharge_request',
+        title: 'Patient Ready for Discharge',
+        message: `Patient ${patient.name} (ID: ${patient.id}) is ready to be discharged. Reason: ${leavingReason || 'Health worker request'}. Reported by: ${currentUser?.name || 'Health Worker'}`,
+        priority: 'high',
+        action_required: true,
+        is_read: false,
+      });
+
+      setNotifySuccess(true);
+      setTimeout(() => {
+        setShowLeavingModal(false);
+        setLeavingPatientId('');
+        setLeavingReason('');
+        setNotifySuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    } finally {
+      setIsNotifying(false);
+    }
+  };
+
   const BedRequestForm = () => {
     const [formData, setFormData] = useState({
       patient_id: '',
@@ -50,7 +94,7 @@ const BedAvailability: React.FC = () => {
       e.preventDefault();
       addBedRequest({
         ...formData,
-        requested_by: 'HW001',
+        requested_by: currentUser?.id,
         request_date: new Date().toISOString().split('T')[0],
         estimated_stay_duration: parseInt(formData.estimated_stay_duration),
         status: 'pending',
@@ -78,7 +122,7 @@ const BedAvailability: React.FC = () => {
               <select
                 required
                 value={formData.patient_id}
-                onChange={(e) => setFormData({...formData, patient_id: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('patient.selectPatient')}</option>
@@ -93,7 +137,7 @@ const BedAvailability: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('bed.urgencyLevel')}</label>
               <select
                 value={formData.urgency_level}
-                onChange={(e) => setFormData({...formData, urgency_level: e.target.value as 'low' | 'medium' | 'high' | 'critical'})}
+                onChange={(e) => setFormData({ ...formData, urgency_level: e.target.value as 'low' | 'medium' | 'high' | 'critical' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="low">{t('urgency.low')}</option>
@@ -107,7 +151,7 @@ const BedAvailability: React.FC = () => {
               <textarea
                 required
                 value={formData.medical_justification}
-                onChange={(e) => setFormData({...formData, medical_justification: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, medical_justification: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Provide medical justification for bed request..."
@@ -118,7 +162,7 @@ const BedAvailability: React.FC = () => {
               <textarea
                 required
                 value={formData.current_condition}
-                onChange={(e) => setFormData({...formData, current_condition: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, current_condition: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Describe patient's current condition..."
@@ -130,7 +174,7 @@ const BedAvailability: React.FC = () => {
                 type="number"
                 required
                 value={formData.estimated_stay_duration}
-                onChange={(e) => setFormData({...formData, estimated_stay_duration: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, estimated_stay_duration: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Days"
               />
@@ -139,7 +183,7 @@ const BedAvailability: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('bed.specialRequirements')}</label>
               <textarea
                 value={formData.special_requirements}
-                onChange={(e) => setFormData({...formData, special_requirements: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, special_requirements: e.target.value })}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Any special requirements or considerations..."
@@ -171,15 +215,24 @@ const BedAvailability: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900">{t('bed.availability')}</h2>
-          <button
-            onClick={() => setShowRequestForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t('bed.request')}</span>
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setShowLeavingModal(true)}
+              className="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition-colors flex items-center space-x-2"
+            >
+              <User className="w-4 h-4" />
+              <span>Notify Patient Leaving</span>
+            </button>
+            <button
+              onClick={() => setShowRequestForm(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t('bed.request')}</span>
+            </button>
+          </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-green-50 p-4 rounded-lg">
             <div className="flex items-center">
@@ -223,7 +276,7 @@ const BedAvailability: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {beds.map(bed => {
           const patient = bed.patient_id ? patients.find(p => p.id === bed.patient_id) : null;
-          
+
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -292,11 +345,10 @@ const BedAvailability: React.FC = () => {
                   <span className="text-sm text-gray-600">
                     {new Date(request.request_date).toLocaleDateString()}
                   </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                     request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
+                      'bg-red-100 text-red-800'
+                    }`}>
                     {t(`common.${request.status}`)}
                   </span>
                 </div>
@@ -307,6 +359,95 @@ const BedAvailability: React.FC = () => {
       </div>
 
       {showRequestForm && <BedRequestForm />}
+
+      {/* Patient Leaving Notification Modal */}
+      {showLeavingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Notify Hospital - Patient Leaving</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Send a notification to the hospital staff that a patient is ready to be discharged.
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {notifySuccess ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                  <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
+                  <p className="text-green-800 font-medium">Notification Sent Successfully!</p>
+                  <p className="text-green-600 text-sm">Hospital staff has been notified.</p>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Patient
+                    </label>
+                    <select
+                      value={leavingPatientId}
+                      onChange={(e) => setLeavingPatientId(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      <option value="">Choose a patient...</option>
+                      {patients.map(patient => (
+                        <option key={patient.id} value={patient.id}>
+                          {patient.name} - {patient.type === 'child' ? 'Child' : 'Pregnant Woman'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Reason for Leaving (Optional)
+                    </label>
+                    <textarea
+                      value={leavingReason}
+                      onChange={(e) => setLeavingReason(e.target.value)}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      placeholder="e.g., Treatment completed, Patient feeling better, Family request..."
+                    />
+                  </div>
+
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                    <p className="text-sm text-orange-800">
+                      <strong>Note:</strong> This will notify the hospital staff that the patient is ready to be discharged. They will then process the discharge and free up the bed.
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {!notifySuccess && (
+              <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowLeavingModal(false);
+                    setLeavingPatientId('');
+                    setLeavingReason('');
+                  }}
+                  disabled={isNotifying}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleNotifyLeaving}
+                  disabled={isNotifying || !leavingPatientId}
+                  className={`px-4 py-2 text-white rounded-md transition-colors ${isNotifying || !leavingPatientId
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-orange-600 hover:bg-orange-700'
+                    }`}
+                >
+                  {isNotifying ? 'Sending...' : 'Send Notification'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,18 +2,18 @@
 
 import React, { useState } from 'react';
 import { Users, Plus, Phone, MapPin, Calendar, Clock, User, Eye, CheckCircle, XCircle, Building } from 'lucide-react';
-import { useApp, Worker } from '../context/AppContext';
+import { useApp, AnganwadiWorker } from '../context/AppContext';
 
 const WorkerManagement: React.FC = () => {
   const { workers, anganwadis, addWorker, t } = useApp();
-  const [selectedWorker, setSelectedWorker] = useState<Worker | null>(null);
+  const [selectedWorker, setSelectedWorker] = useState<AnganwadiWorker | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterRole, setFilterRole] = useState<'all' | 'head' | 'supervisor' | 'helper' | 'asha'>('all');
   const [filterAnganwadi, setFilterAnganwadi] = useState<string>('all');
 
   const filteredWorkers = workers.filter(worker => {
     const matchesRole = filterRole === 'all' || worker.role === filterRole;
-    const matchesAnganwadi = filterAnganwadi === 'all' || worker.anganwadiId === filterAnganwadi;
+    const matchesAnganwadi = filterAnganwadi === 'all' || worker.anganwadi_id === filterAnganwadi;
     return matchesRole && matchesAnganwadi && worker.is_active;
   });
 
@@ -27,9 +27,9 @@ const WorkerManagement: React.FC = () => {
     }
   };
 
-  const WorkerDetailsModal = ({ worker }: { worker: Worker }) => {
-    const anganwadi = anganwadis.find(a => a.id === worker.anganwadiId);
-    
+  const WorkerDetailsModal = ({ worker }: { worker: AnganwadiWorker }) => {
+    const anganwadi = anganwadis.find(a => a.id === worker.anganwadi_id);
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -37,7 +37,7 @@ const WorkerManagement: React.FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">{worker.name}</h3>
-                <p className="text-sm text-gray-600">Employee ID: {worker.employeeId}</p>
+                <p className="text-sm text-gray-600">Employee ID: {worker.employee_id}</p>
               </div>
               <button
                 onClick={() => setSelectedWorker(null)}
@@ -47,27 +47,21 @@ const WorkerManagement: React.FC = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Personal Information</h4>
                 <div className="space-y-2 text-sm">
                   <div><span className="font-medium">{t('common.name')}:</span> {worker.name}</div>
-                  <div><span className="font-medium">Employee ID:</span> {worker.employeeId}</div>
+                  <div><span className="font-medium">Employee ID:</span> {worker.employee_id}</div>
                   <div className="flex items-center space-x-2">
                     <Phone className="w-4 h-4 text-green-600" />
-                    <span>{worker.contactNumber}</span>
+                    <span>{worker.contact_number || worker.contactNumber || 'N/A'}</span>
                   </div>
-                  {worker.address && (
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-blue-600" />
-                      <span>{worker.address}</span>
-                    </div>
-                  )}
                 </div>
               </div>
-              
+
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Work Information</h4>
                 <div className="space-y-2 text-sm">
@@ -77,14 +71,12 @@ const WorkerManagement: React.FC = () => {
                       {t(`worker.${worker.role}`)}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-gray-500" />
-                    <span>Joined: {new Date(worker.joinDate).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span>Hours: {worker.workingHours.start} - {worker.workingHours.end}</span>
-                  </div>
+                  {worker.workingHours && (
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      <span>Hours: {worker.workingHours}</span>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2">
                     {worker.is_active ? (
                       <CheckCircle className="w-4 h-4 text-green-600" />
@@ -116,55 +108,6 @@ const WorkerManagement: React.FC = () => {
                 </div>
               </div>
             )}
-
-            {worker.assignedAreas.length > 0 && (
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3">Assigned Areas</h4>
-                <div className="flex flex-wrap gap-2">
-                  {worker.assignedAreas.map((area: string, index: number) => (
-                    <span key={index} className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                      {area}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {worker.qualifications.length > 0 && (
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3">Qualifications</h4>
-                <div className="flex flex-wrap gap-2">
-                  {worker.qualifications.map((qualification: string, index: number) => (
-                    <span key={index} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                      {qualification}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Emergency Contact</h4>
-              <div className="bg-red-50 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-red-800">{t('common.name')}:</span>
-                    <div className="text-red-700">{worker.emergencyContact.name}</div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-red-800">Relation:</span>
-                    <div className="text-red-700">{worker.emergencyContact.relation}</div>
-                  </div>
-                  <div>
-                    <span className="font-medium text-red-800">{t('common.contact')}:</span>
-                    <div className="text-red-700 flex items-center space-x-1">
-                      <Phone className="w-3 h-3" />
-                      <span>{worker.emergencyContact.contactNumber}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -173,240 +116,115 @@ const WorkerManagement: React.FC = () => {
 
   const AddWorkerForm = () => {
     const [formData, setFormData] = useState({
-      employeeId: '',
+      employee_id: '',
       name: '',
-      role: 'helper' as 'head' | 'supervisor' | 'helper' | 'asha',
-      anganwadiId: '',
-      contactNumber: '',
-      address: '',
-      assignedAreas: '',
-      qualifications: '',
-      workingHoursStart: '09:00',
-      workingHoursEnd: '17:00',
-      emergencyContactName: '',
-      emergencyContactRelation: '',
-      emergencyContactNumber: '',
-      joinDate: new Date().toISOString().split('T')[0],
+      role: 'helper' as string,
+      anganwadi_id: '',
+      contact_number: '',
+      workingHours: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      
-      const newWorker: Omit<Worker, 'id'> = {
-        employeeId: formData.employeeId,
+
+      const newWorker: Omit<AnganwadiWorker, 'id' | 'created_at' | 'updated_at'> = {
+        employee_id: formData.employee_id,
         name: formData.name,
         role: formData.role,
-        anganwadiId: formData.anganwadiId || undefined,
-        contactNumber: formData.contactNumber,
-        address: formData.address || undefined,
-        assignedAreas: formData.assignedAreas.split(',').map(a => a.trim()).filter(a => a),
-        qualifications: formData.qualifications.split(',').map(q => q.trim()).filter(q => q),
-        workingHours: {
-          start: formData.workingHoursStart,
-          end: formData.workingHoursEnd,
-        },
-        emergencyContact: {
-          name: formData.emergencyContactName,
-          relation: formData.emergencyContactRelation,
-          contactNumber: formData.emergencyContactNumber,
-        },
-        joinDate: formData.joinDate,
-        isActive: true,
+        anganwadi_id: formData.anganwadi_id || undefined,
+        contact_number: formData.contact_number,
+        workingHours: formData.workingHours || undefined,
+        is_active: true,
       };
 
       addWorker(newWorker);
       setShowAddForm(false);
       setFormData({
-        employeeId: '',
+        employee_id: '',
         name: '',
         role: 'helper',
-        anganwadiId: '',
-        contactNumber: '',
-        address: '',
-        assignedAreas: '',
-        qualifications: '',
-        workingHoursStart: '09:00',
-        workingHoursEnd: '17:00',
-        emergencyContactName: '',
-        emergencyContactRelation: '',
-        emergencyContactNumber: '',
-        joinDate: new Date().toISOString().split('T')[0],
+        anganwadi_id: '',
+        contact_number: '',
+        workingHours: '',
       });
     };
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Add New Worker</h3>
           </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <div>
-              <h4 className="text-md font-medium text-gray-900 mb-4">Basic Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.employeeId}
-                    onChange={(e) => setFormData({...formData, employeeId: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="EMP001"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value as 'head' | 'supervisor' | 'helper' | 'asha'})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="helper">Helper</option>
-                    <option value="head">Head</option>
-                    <option value="supervisor">Supervisor</option>
-                    <option value="asha">ASHA Worker</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Anganwadi Assignment</label>
-                  <select
-                    value={formData.anganwadiId}
-                    onChange={(e) => setFormData({...formData, anganwadiId: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">No Assignment</option>
-                    {anganwadis.map(anganwadi => (
-                      <option key={anganwadi.id} value={anganwadi.id}>
-                        {anganwadi.name} - {anganwadi.location.area}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.contactNumber}
-                    onChange={(e) => setFormData({...formData, contactNumber: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Join Date *</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.joinDate}
-                    onChange={(e) => setFormData({...formData, joinDate: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.employee_id}
+                  onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="EMP001"
+                />
               </div>
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <textarea
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  rows={2}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-            </div>
-
-            <div>
-              <h4 className="text-md font-medium text-gray-900 mb-4">Work Information</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Working Hours Start *</label>
-                  <input
-                    type="time"
-                    required
-                    value={formData.workingHoursStart}
-                    onChange={(e) => setFormData({...formData, workingHoursStart: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Working Hours End *</label>
-                  <input
-                    type="time"
-                    required
-                    value={formData.workingHoursEnd}
-                    onChange={(e) => setFormData({...formData, workingHoursEnd: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="helper">Helper</option>
+                  <option value="head">Head</option>
+                  <option value="supervisor">Supervisor</option>
+                  <option value="asha">ASHA Worker</option>
+                </select>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Areas (comma separated)</label>
-                  <textarea
-                    value={formData.assignedAreas}
-                    onChange={(e) => setFormData({...formData, assignedAreas: e.target.value})}
-                    rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Area 1, Area 2, Area 3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Qualifications (comma separated)</label>
-                  <textarea
-                    value={formData.qualifications}
-                    onChange={(e) => setFormData({...formData, qualifications: e.target.value})}
-                    rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="ANM Certification, Child Care Training"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Anganwadi Assignment</label>
+                <select
+                  value={formData.anganwadi_id}
+                  onChange={(e) => setFormData({ ...formData, anganwadi_id: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">No Assignment</option>
+                  {anganwadis.map(anganwadi => (
+                    <option key={anganwadi.id} value={anganwadi.id}>
+                      {anganwadi.name} - {anganwadi.location.area}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-
-            <div>
-              <h4 className="text-md font-medium text-gray-900 mb-4">Emergency Contact</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.emergencyContactName}
-                    onChange={(e) => setFormData({...formData, emergencyContactName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Relation *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.emergencyContactRelation}
-                    onChange={(e) => setFormData({...formData, emergencyContactRelation: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Husband, Mother, Father, etc."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.emergencyContactNumber}
-                    onChange={(e) => setFormData({...formData, emergencyContactNumber: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Number *</label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.contact_number}
+                  onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Working Hours</label>
+                <input
+                  type="text"
+                  value={formData.workingHours}
+                  onChange={(e) => setFormData({ ...formData, workingHours: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="9:00 AM - 5:00 PM"
+                />
               </div>
             </div>
 
@@ -530,8 +348,8 @@ const WorkerManagement: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredWorkers.map(worker => {
-          const anganwadi = anganwadis.find(a => a.id === worker.anganwadiId);
-          
+          const anganwadi = anganwadis.find(a => a.id === worker.anganwadi_id);
+
           return (
             <div key={worker.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -541,7 +359,7 @@ const WorkerManagement: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{worker.name}</h3>
-                    <p className="text-sm text-gray-600">ID: {worker.employeeId}</p>
+                    <p className="text-sm text-gray-600">ID: {worker.employee_id}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -560,7 +378,7 @@ const WorkerManagement: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Phone className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-700">{worker.contactNumber}</span>
+                  <span className="text-sm text-gray-700">{worker.contact_number || worker.contactNumber || 'N/A'}</span>
                 </div>
 
                 {anganwadi && (
@@ -576,55 +394,20 @@ const WorkerManagement: React.FC = () => {
                   </div>
                 )}
 
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Working Hours</h4>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-700">
-                      {worker.workingHours.start} - {worker.workingHours.end}
-                    </span>
-                  </div>
-                </div>
-
-                {worker.assignedAreas.length > 0 && (
+                {worker.workingHours && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Assigned Areas</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {worker.assignedAreas.slice(0, 2).map((area: string, index: number) => (
-                        <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-                          {area}
-                        </span>
-                      ))}
-                      {worker.assignedAreas.length > 2 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                          +{worker.assignedAreas.length - 2} more
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {worker.qualifications.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Qualifications</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {worker.qualifications.slice(0, 2).map((qualification: string, index: number) => (
-                        <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
-                          {qualification}
-                        </span>
-                      ))}
-                      {worker.qualifications.length > 2 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                          +{worker.qualifications.length - 2} more
-                        </span>
-                      )}
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">Working Hours</h4>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm text-gray-700">{worker.workingHours}</span>
                     </div>
                   </div>
                 )}
 
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>Joined: {new Date(worker.joinDate).toLocaleDateString()}</span>
+                  <span className={`px-2 py-1 rounded-full text-xs ${worker.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {worker.is_active ? 'Active' : 'Inactive'}
+                  </span>
                 </div>
               </div>
             </div>

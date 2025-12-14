@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const registeredBy = searchParams.get('registeredBy') || undefined;
     const type = searchParams.get('type') || undefined;
+    const isActiveParam = searchParams.get('isActive');
     const limit = parseInt(searchParams.get('limit') || '100');
     const offset = parseInt(searchParams.get('offset') || '0');
 
@@ -30,8 +31,15 @@ export async function GET(request: NextRequest) {
       query = query.eq('type', type);
     }
 
+    // Handle isActive filter - if specified use that value, otherwise default to true
+    if (isActiveParam !== null) {
+      const isActive = isActiveParam === 'true';
+      query = query.eq('is_active', isActive);
+    } else {
+      query = query.eq('is_active', true);
+    }
+
     const { data: patients, error, count } = await query
-      .eq('is_active', true)
       .order('registration_date', { ascending: false })
       .range(offset, offset + limit - 1);
 

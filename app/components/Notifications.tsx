@@ -1,23 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bell, CheckCircle, AlertTriangle, Clock, User, Calendar, Eye, AreaChart as MarkAsUnread } from 'lucide-react';
+import { Bell, CheckCircle, AlertTriangle, Clock, User, Calendar, Eye, AreaChart as MarkAsUnread, LogOut } from 'lucide-react';
 import { useApp, Notification } from '../context/AppContext';
 
 const Notifications: React.FC = () => {
-  const { notifications, markNotificationRead, loadNotifications, t } = useApp();
+  const { notifications, markNotificationRead, loadNotifications, t, dischargePatient, patients, beds, updateBed } = useApp();
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadNotifications();
   }, []);
-  const [filterType, setFilterType] = useState<'all' | 'admission_status' | 'bed_approval' | 'supervisor_instruction' | 'high_risk_alert' | 'bed_request' | 'discharge_tracking'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'admission_status' | 'bed_approval' | 'supervisor_instruction' | 'high_risk_alert' | 'bed_request' | 'discharge_tracking' | 'patient_discharge_request'>('all');
   const [filterRead, setFilterRead] = useState<'all' | 'read' | 'unread'>('all');
 
   const filteredNotifications = notifications.filter(notification => {
     const matchesType = filterType === 'all' || notification.type === filterType;
     const matchesRead = filterRead === 'all' ||
-                       (filterRead === 'read' && notification.is_read) ||
-                       (filterRead === 'unread' && !notification.is_read);
+      (filterRead === 'read' && notification.is_read) ||
+      (filterRead === 'unread' && !notification.is_read);
     return matchesType && matchesRead;
   });
 
@@ -29,6 +30,7 @@ const Notifications: React.FC = () => {
       case 'high_risk_alert': return 'bg-red-100 text-red-800';
       case 'bed_request': return 'bg-yellow-100 text-yellow-800';
       case 'discharge_tracking': return 'bg-indigo-100 text-indigo-800';
+      case 'patient_discharge_request': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -51,12 +53,51 @@ const Notifications: React.FC = () => {
       case 'high_risk_alert': return <AlertTriangle className="w-4 h-4" />;
       case 'bed_request': return <Clock className="w-4 h-4" />;
       case 'discharge_tracking': return <Calendar className="w-4 h-4" />;
+      case 'patient_discharge_request': return <User className="w-4 h-4" />;
       default: return <Bell className="w-4 h-4" />;
     }
   };
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
   const criticalCount = notifications.filter(n => n.priority === 'critical' && !n.is_read).length;
+
+  // Handle release bed action for patient discharge requests
+  const handleReleaseBed = async (notification: Notification) => {
+    setProcessingId(notification.id);
+    try {
+      // Extract patient ID from the notification message
+      // Message format: "Patient Name (ID: uuid) is ready to be discharged..."
+      const idMatch = notification.message.match(/\(ID: ([a-f0-9-]+)\)/i);
+      if (idMatch && idMatch[1]) {
+        const patientId = idMatch[1];
+        const patient = patients.find(p => p.id === patientId);
+
+        if (patient) {
+          // Find the bed assigned to this patient
+          const bed = beds.find(b => b.patient_id === patientId);
+          const bedId = bed?.id || patient.bed_id || '';
+
+          // Discharge the patient (will also update bed status)
+          await dischargePatient(patientId, bedId, 'Discharged via notification - Health worker request');
+
+          // Mark notification as read
+          await markNotificationRead(notification.id);
+
+          alert('✅ Patient discharged and bed released successfully!');
+        } else {
+          alert('⚠️ Patient not found. They may have already been discharged.');
+          await markNotificationRead(notification.id);
+        }
+      } else {
+        alert('⚠️ Could not find patient ID in notification. Please use Bed Dashboard.');
+      }
+    } catch (error) {
+      console.error('Error releasing bed:', error);
+      alert('❌ Error processing discharge. Please try again or use Bed Dashboard.');
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -85,7 +126,7 @@ const Notifications: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Type</label>
             <select
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value as 'all' | 'admission_status' | 'bed_approval' | 'supervisor_instruction' | 'high_risk_alert' | 'bed_request' | 'discharge_tracking')}
+              onChange={(e) => setFilterType(e.target.value as 'all' | 'admission_status' | 'bed_approval' | 'supervisor_instruction' | 'high_risk_alert' | 'bed_request' | 'discharge_tracking' | 'patient_discharge_request')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Types</option>
@@ -95,6 +136,7 @@ const Notifications: React.FC = () => {
               <option value="high_risk_alert">{t('notification.highRiskAlert')}</option>
               <option value="bed_request">{t('notification.bedRequest')}</option>
               <option value="discharge_tracking">{t('notification.dischargeTracking')}</option>
+              <option value="patient_discharge_request">Patient Leaving Request</option>
             </select>
           </div>
           <div>
@@ -163,9 +205,8 @@ const Notifications: React.FC = () => {
           filteredNotifications.map(notification => (
             <div
               key={notification.id}
-              className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all hover:shadow-md ${
-                !notification.is_read ? 'border-l-4 border-l-blue-500' : ''
-              }`}
+              className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all hover:shadow-md ${!notification.is_read ? 'border-l-4 border-l-blue-500' : ''
+                }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 flex-1">
@@ -190,6 +231,26 @@ const Notifications: React.FC = () => {
                     <p className={`text-sm ${!notification.is_read ? 'text-gray-800' : 'text-gray-600'} mb-3`}>
                       {notification.message}
                     </p>
+                    {notification.type === 'patient_discharge_request' && notification.action_required && !notification.is_read && (
+                      <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm text-orange-800 font-medium">
+                            📋 This patient is ready to be discharged
+                          </p>
+                          <button
+                            onClick={() => handleReleaseBed(notification)}
+                            disabled={processingId === notification.id}
+                            className={`px-4 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${processingId === notification.id
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                              }`}
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span>{processingId === notification.id ? 'Processing...' : 'Release Bed'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-center space-x-4 text-xs text-gray-500">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-3 h-3" />

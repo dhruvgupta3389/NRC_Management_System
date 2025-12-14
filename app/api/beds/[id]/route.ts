@@ -62,16 +62,31 @@ export async function PUT(
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const updateData = {
-      status: body.status,
-      patient_id: body.patientId || null,
-      admission_date: body.admissionDate || null,
-      patient_name: body.patientName || null,
-      patient_type: body.patientType || null,
-      nutrition_status: body.nutritionStatus || null,
-      hospital_name: body.hospitalName || null,
+    // Support both camelCase and snake_case property names
+    const updateData: Record<string, any> = {
       updated_at: new Date().toISOString()
     };
+
+    // Map request body to database columns (accept both formats)
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.patient_id !== undefined || body.patientId !== undefined) {
+      updateData.patient_id = body.patient_id ?? body.patientId ?? null;
+    }
+    if (body.admission_date !== undefined || body.admissionDate !== undefined) {
+      updateData.admission_date = body.admission_date ?? body.admissionDate ?? null;
+    }
+    if (body.patient_name !== undefined || body.patientName !== undefined) {
+      updateData.patient_name = body.patient_name ?? body.patientName ?? null;
+    }
+    if (body.patient_type !== undefined || body.patientType !== undefined) {
+      updateData.patient_type = body.patient_type ?? body.patientType ?? null;
+    }
+    if (body.nutrition_status !== undefined || body.nutritionStatus !== undefined) {
+      updateData.nutrition_status = body.nutrition_status ?? body.nutritionStatus ?? null;
+    }
+    if (body.hospital_name !== undefined || body.hospitalName !== undefined) {
+      updateData.hospital_name = body.hospital_name ?? body.hospitalName ?? null;
+    }
 
     const { data: result, error } = await supabase
       .from('beds')

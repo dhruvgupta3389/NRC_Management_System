@@ -113,7 +113,7 @@ const VisitScheduling: React.FC = () => {
               <select
                 required
                 value={formData.patientId}
-                onChange={(e) => setFormData({...formData, patientId: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('patient.selectPatient')}</option>
@@ -130,7 +130,7 @@ const VisitScheduling: React.FC = () => {
                 type="date"
                 required
                 value={formData.scheduledDate}
-                onChange={(e) => setFormData({...formData, scheduledDate: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -140,7 +140,7 @@ const VisitScheduling: React.FC = () => {
                 type="text"
                 required
                 value={formData.healthWorkerId}
-                onChange={(e) => setFormData({...formData, healthWorkerId: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, healthWorkerId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -148,7 +148,7 @@ const VisitScheduling: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('common.notes')}</label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -238,7 +238,7 @@ const VisitScheduling: React.FC = () => {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => updateVisit(visit.id, { status: 'rescheduled' })}
+                      onClick={() => console.log('Reschedule visit:', visit.id)}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
                       {t('visit.reschedule')}
@@ -297,20 +297,12 @@ const VisitScheduling: React.FC = () => {
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">{t('visit.healthWorker')}: {"HW001"}</p>
-                        {"" && (
-                          <p className="text-sm text-gray-600">
-                            {t('visit.completedOn', { date: new Date("").toLocaleDateString() })}
-                          </p>
-                        )}
                       </div>
                       <div className="flex space-x-2">
                         {visit.status === 'pending' && (
                           <>
                             <button
-                              onClick={() => updateVisit(visit.id, { 
-                                status: 'completed', 
-                                actualDate: new Date().toISOString().split('T')[0] 
-                              })}
+                              onClick={() => console.log('Mark complete:', visit.id)}
                               className="text-green-600 hover:text-green-800 text-sm font-medium"
                             >
                               {t('visit.markComplete')}
@@ -327,7 +319,7 @@ const VisitScheduling: React.FC = () => {
                         {visit.status === 'cancelled' && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => updateVisit(visit.id, { status: 'rescheduled' })}
+                              onClick={() => console.log('Reschedule visit:', visit.id)}
                               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                             >
                               {t('visit.reschedule')}

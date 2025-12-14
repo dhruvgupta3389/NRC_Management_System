@@ -5,11 +5,12 @@ import { Bed, Plus, CheckCircle, XCircle, AlertTriangle, User, Calendar, Clock, 
 import { useApp, BedRequest } from '../context/AppContext';
 
 const BedRequests: React.FC = () => {
-  const { bedRequests, patients, beds, updateBedRequest, updateBed, loadPatients, loadBeds, t } = useApp();
+  const { bedRequests, patients, beds, updateBedRequest, updateBed, loadPatients, loadBeds, loadBedRequests, t } = useApp();
 
   useEffect(() => {
     loadPatients();
     loadBeds();
+    loadBedRequests();
   }, []);
   const [selectedRequest, setSelectedRequest] = useState<BedRequest | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'declined'>('all');
@@ -120,7 +121,7 @@ const BedRequests: React.FC = () => {
         alert('Please provide review comments and referral reason');
         return;
       }
-      
+
       const updates: Partial<BedRequest> = {
         status: 'declined',
         hospitalReferral: {
@@ -150,7 +151,7 @@ const BedRequests: React.FC = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="p-6 space-y-6">
             <div className="bg-gray-50 p-4 rounded-lg">
               <h4 className="font-medium text-gray-900 mb-3">Patient Information</h4>
@@ -270,7 +271,7 @@ const BedRequests: React.FC = () => {
                           <input
                             type="text"
                             value={hospitalData.hospitalName}
-                            onChange={(e) => setHospitalData({...hospitalData, hospitalName: e.target.value})}
+                            onChange={(e) => setHospitalData({ ...hospitalData, hospitalName: e.target.value })}
                             className="w-full px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
@@ -279,7 +280,7 @@ const BedRequests: React.FC = () => {
                           <input
                             type="text"
                             value={hospitalData.contactNumber}
-                            onChange={(e) => setHospitalData({...hospitalData, contactNumber: e.target.value})}
+                            onChange={(e) => setHospitalData({ ...hospitalData, contactNumber: e.target.value })}
                             className="w-full px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
@@ -287,7 +288,7 @@ const BedRequests: React.FC = () => {
                           <label className="block text-sm font-medium text-blue-700 mb-1">Urgency</label>
                           <select
                             value={hospitalData.urgencyLevel}
-                            onChange={(e) => setHospitalData({...hospitalData, urgencyLevel: e.target.value as 'routine' | 'urgent' | 'emergency'})}
+                            onChange={(e) => setHospitalData({ ...hospitalData, urgencyLevel: e.target.value as 'routine' | 'urgent' | 'emergency' })}
                             className="w-full px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
                             <option value="routine">{t('urgency.routine')}</option>
@@ -299,7 +300,7 @@ const BedRequests: React.FC = () => {
                           <label className="block text-sm font-medium text-blue-700 mb-1">{t('bed.referralReason')}</label>
                           <textarea
                             value={hospitalData.referralReason}
-                            onChange={(e) => setHospitalData({...hospitalData, referralReason: e.target.value})}
+                            onChange={(e) => setHospitalData({ ...hospitalData, referralReason: e.target.value })}
                             rows={2}
                             className="w-full px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Reason for hospital referral..."
@@ -328,7 +329,7 @@ const BedRequests: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div><span className="font-medium">Reviewed By:</span> {request.reviewedBy}</div>
                     <div><span className="font-medium">Review Date:</span> {request.reviewDate && new Date(request.reviewDate).toLocaleDateString()}</div>
-                    <div><span className="font-medium">{t('common.status')}:</span> 
+                    <div><span className="font-medium">{t('common.status')}:</span>
                       <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(request.status)}`}>
                         {t(`common.${request.status}`)}
                       </span>
@@ -462,7 +463,7 @@ const BedRequests: React.FC = () => {
         ) : (
           filteredRequests.map(request => {
             const patient = patients.find(p => p.id === request.patient_id);
-            
+
             return (
               <div key={request.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">

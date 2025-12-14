@@ -61,7 +61,7 @@ const VisitTicketing: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-      
+
       const newTicket: Omit<MissedVisitTicket, 'id'> = {
         patientId: formData.patientId,
         visitId: formData.visitId,
@@ -103,7 +103,7 @@ const VisitTicketing: React.FC = () => {
               <select
                 required
                 value={formData.patientId}
-                onChange={(e) => setFormData({...formData, patientId: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('patient.selectPatient')}</option>
@@ -146,7 +146,7 @@ const VisitTicketing: React.FC = () => {
                 <input
                   type="text"
                   value={formData.otherReason}
-                  onChange={(e) => setFormData({...formData, otherReason: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, otherReason: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Specify other reason..."
                 />
@@ -157,7 +157,7 @@ const VisitTicketing: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Actions Taken (comma separated)</label>
               <textarea
                 value={formData.actionsTaken}
-                onChange={(e) => setFormData({...formData, actionsTaken: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, actionsTaken: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Attempted visit, Left message with neighbor, etc."
@@ -170,7 +170,7 @@ const VisitTicketing: React.FC = () => {
                 type="date"
                 required
                 value={formData.nextAttemptDate}
-                onChange={(e) => setFormData({...formData, nextAttemptDate: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, nextAttemptDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -216,7 +216,7 @@ const VisitTicketing: React.FC = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="p-6 space-y-6">
             <div className="bg-blue-50 p-4 rounded-lg">
               <h4 className="font-medium text-blue-900 mb-2">Patient Information</h4>
@@ -257,7 +257,7 @@ const VisitTicketing: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Missed Visit Conditions</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {Object.entries(ticket.missedConditions).map(([key, value]: [string, boolean]) => {
+                {Object.entries(ticket.missedConditions).map(([key, value]) => {
                   if (!value) return null;
                   return (
                     <span key={key} className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
@@ -382,7 +382,7 @@ const VisitTicketing: React.FC = () => {
         ) : (
           filteredTickets.map(ticket => {
             const patient = patients.find(p => p.id === ticket.patient_id);
-            
+
             return (
               <div key={ticket.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">

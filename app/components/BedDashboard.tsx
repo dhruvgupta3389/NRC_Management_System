@@ -5,12 +5,18 @@ import { Bed, Plus, CheckCircle, XCircle, Wrench, User, Calendar, AlertCircle, F
 import { useApp, Bed as BedType } from '../context/AppContext';
 
 const BedDashboard: React.FC = () => {
-  const { beds, patients, bedRequests, updateBed, loadBeds, t } = useApp();
+  const { beds, patients, bedRequests, updateBed, loadBeds, loadPatients, loadBedRequests, dischargePatient, t } = useApp();
   const [selectedWard, setSelectedWard] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [showDischargeModal, setShowDischargeModal] = useState(false);
+  const [dischargeTarget, setDischargeTarget] = useState<{ bedId: string; patientId: string; patientName: string } | null>(null);
+  const [dischargeReason, setDischargeReason] = useState('');
+  const [isDischarging, setIsDischarging] = useState(false);
 
   useEffect(() => {
     loadBeds();
+    loadPatients();
+    loadBedRequests();
   }, []);
 
   const wards = ['all', ...Array.from(new Set(beds.map(bed => bed.ward)))];
@@ -44,6 +50,28 @@ const BedDashboard: React.FC = () => {
   const maintenanceBeds = beds.filter(bed => bed.status === 'maintenance');
   const pendingRequests = bedRequests.filter(req => req.status === 'pending');
 
+  const openDischargeModal = (bedId: string, patientId: string, patientName: string) => {
+    setDischargeTarget({ bedId, patientId, patientName });
+    setDischargeReason('');
+    setShowDischargeModal(true);
+  };
+
+  const handleDischarge = async () => {
+    if (!dischargeTarget) return;
+
+    setIsDischarging(true);
+    try {
+      await dischargePatient(dischargeTarget.patientId, dischargeTarget.bedId, dischargeReason || 'Patient discharged');
+      setShowDischargeModal(false);
+      setDischargeTarget(null);
+      setDischargeReason('');
+    } catch (error) {
+      console.error('Error discharging patient:', error);
+    } finally {
+      setIsDischarging(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -54,7 +82,7 @@ const BedDashboard: React.FC = () => {
             <p className="text-gray-600">Real-time bed status and management for NRC-equipped hospital</p>
           </div>
         </div>
-        
+
         {/* Real-time Stats */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           <div className="bg-green-50 p-4 rounded-lg">
@@ -195,7 +223,7 @@ const BedDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredBeds.map(bed => {
           const patient = bed.patient_id ? patients.find(p => p.id === bed.patient_id) : null;
-          
+
           return (
             <div key={bed.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -234,7 +262,7 @@ const BedDashboard: React.FC = () => {
                       <span className="font-medium">{t('common.status')}:</span> {patient.nutrition_status.replace('_', ' ')}
                     </div>
                     <div>
-                      <span className="font-medium">Duration:</span> {bed.admission_date ? 
+                      <span className="font-medium">Duration:</span> {bed.admission_date ?
                         Math.ceil((new Date().getTime() - new Date(bed.admission_date).getTime()) / (1000 * 60 * 60 * 24)) : 0
                       } days
                     </div>
@@ -243,14 +271,10 @@ const BedDashboard: React.FC = () => {
               )}
 
               <div className="flex space-x-2">
-                {bed.status === 'occupied' && (
+                {bed.status === 'occupied' && patient && (
                   <button
-                    onClick={() => updateBed(bed.id, {
-                      status: 'available',
-                      patient_id: undefined,
-                      admission_date: undefined
-                    })}
-                    className="flex-1 bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors text-sm"
+                    onClick={() => openDischargeModal(bed.id, patient.id, patient.name)}
+                    className="flex-1 bg-orange-600 text-white px-3 py-2 rounded-md hover:bg-orange-700 transition-colors text-sm"
                   >
                     Discharge Patient
                   </button>
@@ -296,7 +320,7 @@ const BedDashboard: React.FC = () => {
             const wardOccupied = wardBeds.filter(bed => bed.status === 'occupied').length;
             const wardMaintenance = wardBeds.filter(bed => bed.status === 'maintenance').length;
             const occupancyRate = wardBeds.length > 0 ? Math.round((wardOccupied / wardBeds.length) * 100) : 0;
-            
+
             return (
               <div key={ward} className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-medium text-gray-900 mb-3">{ward} Ward</h4>
@@ -329,6 +353,66 @@ const BedDashboard: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Discharge Modal */}
+      {showDischargeModal && dischargeTarget && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Discharge Patient</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                You are discharging <strong>{dischargeTarget.patientName}</strong>
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-sm text-orange-800">
+                  <strong>Note:</strong> The bed will be set to "Maintenance" after discharge.
+                  The patient record will be archived but can be reactivated later.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Discharge Reason / Notes
+                </label>
+                <textarea
+                  value={dischargeReason}
+                  onChange={(e) => setDischargeReason(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  placeholder="Enter discharge reason or notes (optional)..."
+                />
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDischargeModal(false);
+                  setDischargeTarget(null);
+                  setDischargeReason('');
+                }}
+                disabled={isDischarging}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDischarge}
+                disabled={isDischarging}
+                className={`px-4 py-2 text-white rounded-md transition-colors ${isDischarging
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-orange-600 hover:bg-orange-700'
+                  }`}
+              >
+                {isDischarging ? 'Processing...' : 'Confirm Discharge'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -21,7 +21,9 @@ import {
   Shield,
   Stethoscope,
   ClipboardList,
-  TrendingUp
+  TrendingUp,
+  Plus,
+  ClipboardCheck
 } from 'lucide-react';
 import Login from './components/Login';
 import AdminPanel from './components/AdminPanel';
@@ -47,6 +49,9 @@ import TreatmentTracker from './components/TreatmentTracker';
 import MedicalReports from './components/MedicalReports';
 import BedDemandPrediction from './components/BedDemandPrediction';
 import AIHealthPrediction from './components/AIHealthPrediction';
+import AddBed from './components/AddBed';
+import DischargedPatients from './components/DischargedPatients';
+import ReleaseBed from './components/ReleaseBed';
 import { useApp } from './context/AppContext';
 
 function AppContent() {
@@ -98,6 +103,10 @@ function AppContent() {
       return [
         ...baseNavigation,
         { id: 'bedDashboard', name: t('nav.bedDashboard'), icon: Bed },
+        { id: 'bedRequests', name: t('nav.bedRequests'), icon: ClipboardCheck },
+        { id: 'addBed', name: 'Add New Bed', icon: Plus },
+        { id: 'releaseBed', name: 'Release Bed', icon: LogOut },
+        { id: 'dischargedPatients', name: 'Discharged Patients', icon: FileText },
         { id: 'notifications', name: t('nav.notifications'), icon: Bell },
         { id: 'treatmentTracker', name: t('nav.treatmentTracker'), icon: Stethoscope },
         { id: 'medicalReports', name: t('nav.medicalReports'), icon: FileText },
@@ -183,6 +192,12 @@ function AppContent() {
         return hasAccess('medicalReports') ? <MedicalReports /> : <div className="p-8 text-center text-gray-500">Access Denied</div>;
       case 'bedDemandPrediction':
         return hasAccess('bedDemandPrediction') ? <BedDemandPrediction /> : <div className="p-8 text-center text-gray-500">Access Denied</div>;
+      case 'addBed':
+        return hasAccess('addBed') ? <AddBed /> : <div className="p-8 text-center text-gray-500">Access Denied</div>;
+      case 'dischargedPatients':
+        return hasAccess('dischargedPatients') ? <DischargedPatients /> : <div className="p-8 text-center text-gray-500">Access Denied</div>;
+      case 'releaseBed':
+        return hasAccess('releaseBed') ? <ReleaseBed /> : <div className="p-8 text-center text-gray-500">Access Denied</div>;
       default:
         return <Dashboard />;
     }
@@ -261,11 +276,10 @@ function AppContent() {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${
-                        activeTab === item.id
-                          ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                      className={`w-full flex items-center px-3 py-2 text-left rounded-md transition-colors ${activeTab === item.id
+                        ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
+                        : 'text-gray-700 hover:bg-gray-50'
+                        }`}
                     >
                       <Icon className="w-5 h-5 mr-3" />
                       <span className="text-sm font-medium">{item.name}</span>

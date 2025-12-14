@@ -62,30 +62,43 @@ export async function PUT(
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const updateData = {
-      name: body.name,
-      age: body.age,
-      type: body.type,
-      pregnancy_week: body.pregnancyWeek,
-      contact_number: body.contactNumber,
-      emergency_contact: body.emergencyContact,
-      address: body.address,
-      weight: body.weight,
-      height: body.height,
-      blood_pressure: body.bloodPressure,
-      temperature: body.temperature,
-      hemoglobin: body.hemoglobin,
-      nutrition_status: body.nutritionStatus,
-      medical_history: body.medicalHistory,
-      symptoms: body.symptoms,
-      remarks: body.remarks,
-      risk_score: body.riskScore,
-      nutritional_deficiency: body.nutritionalDeficiency,
-      last_visit_date: body.lastVisitDate,
-      next_visit_date: body.nextVisitDate,
-      bed_id: body.bedId,
+    // Build update object dynamically to only update provided fields
+    const updateData: Record<string, any> = {
       updated_at: new Date().toISOString()
     };
+
+    // Standard patient fields
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.age !== undefined) updateData.age = body.age;
+    if (body.type !== undefined) updateData.type = body.type;
+    if (body.pregnancyWeek !== undefined) updateData.pregnancy_week = body.pregnancyWeek;
+    if (body.contactNumber !== undefined) updateData.contact_number = body.contactNumber;
+    if (body.emergencyContact !== undefined) updateData.emergency_contact = body.emergencyContact;
+    if (body.address !== undefined) updateData.address = body.address;
+    if (body.weight !== undefined) updateData.weight = body.weight;
+    if (body.height !== undefined) updateData.height = body.height;
+    if (body.bloodPressure !== undefined) updateData.blood_pressure = body.bloodPressure;
+    if (body.temperature !== undefined) updateData.temperature = body.temperature;
+    if (body.hemoglobin !== undefined) updateData.hemoglobin = body.hemoglobin;
+    if (body.nutritionStatus !== undefined) updateData.nutrition_status = body.nutritionStatus;
+    if (body.medicalHistory !== undefined) updateData.medical_history = body.medicalHistory;
+    if (body.symptoms !== undefined) updateData.symptoms = body.symptoms;
+    if (body.remarks !== undefined) updateData.remarks = body.remarks;
+    if (body.riskScore !== undefined) updateData.risk_score = body.riskScore;
+    if (body.nutritionalDeficiency !== undefined) updateData.nutritional_deficiency = body.nutritionalDeficiency;
+    if (body.lastVisitDate !== undefined) updateData.last_visit_date = body.lastVisitDate;
+    if (body.nextVisitDate !== undefined) updateData.next_visit_date = body.nextVisitDate;
+
+    // UUID fields - convert empty strings to null to avoid PostgreSQL uuid validation errors
+    const toNullIfEmpty = (val: any) => (val === '' || val === null) ? null : val;
+    if (body.bedId !== undefined) updateData.bed_id = toNullIfEmpty(body.bedId);
+
+    // Discharge-related fields (for discharge workflow)
+    if (body.isActive !== undefined) updateData.is_active = body.isActive;
+    if (body.dischargeDate !== undefined) updateData.discharge_date = body.dischargeDate;
+    if (body.dischargeReason !== undefined) updateData.discharge_reason = body.dischargeReason;
+    if (body.lastBedId !== undefined) updateData.last_bed_id = toNullIfEmpty(body.lastBedId);
+    if (body.lastAdmissionDate !== undefined) updateData.last_admission_date = body.lastAdmissionDate;
 
     const { data: result, error } = await supabase
       .from('patients')

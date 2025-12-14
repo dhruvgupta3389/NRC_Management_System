@@ -1,0 +1,24 @@
+﻿app/components/VisitTicketing.tsx(260,62): error TS2345: Argument of type '([key, value]: [string, boolean]) => React.JSX.Element | null' is not assignable to parameter of type '(value: [string, unknown], index: number, array: [string, unknown][]) => Element | null'.
+  Types of parameters '__0' and 'value' are incompatible.
+    Type '[string, unknown]' is not assignable to type '[string, boolean]'.
+      Type at position 1 in source is not compatible with type at position 1 in target.
+        Type 'unknown' is not assignable to type 'boolean'.
+app/components/WorkerManagement.tsx(5,18): error TS2305: Module '"../context/AppContext"' has no exported member 'Worker'.
+app/components/WorkerManagement.tsx(16,66): error TS2551: Property 'anganwadiId' does not exist on type 'AnganwadiWorker'. Did you mean 'anganwadi_id'?
+app/components/WorkerManagement.tsx(217,17): error TS2345: Argument of type 'Omit<Worker, "id">' is not assignable to parameter of type 'Omit<AnganwadiWorker, "id" | "created_at" | "updated_at">'.
+  Type 'Omit<Worker, "id">' is missing the following properties from type 'Omit<AnganwadiWorker, "id" | "created_at" | "updated_at">': name, is_active, employee_id, role
+app/components/WorkerManagement.tsx(533,66): error TS2551: Property 'anganwadiId' does not exist on type 'AnganwadiWorker'. Did you mean 'anganwadi_id'?
+app/components/WorkerManagement.tsx(544,70): error TS2551: Property 'employeeId' does not exist on type 'AnganwadiWorker'. Did you mean 'employee_id'?
+app/components/WorkerManagement.tsx(584,24): error TS18048: 'worker.workingHours' is possibly 'undefined'.
+app/components/WorkerManagement.tsx(584,44): error TS2339: Property 'start' does not exist on type 'string'.
+app/components/WorkerManagement.tsx(584,54): error TS18048: 'worker.workingHours' is possibly 'undefined'.
+app/components/WorkerManagement.tsx(584,74): error TS2339: Property 'end' does not exist on type 'string'.
+app/components/WorkerManagement.tsx(589,25): error TS2339: Property 'assignedAreas' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(593,31): error TS2339: Property 'assignedAreas' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(598,31): error TS2339: Property 'assignedAreas' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(600,36): error TS2339: Property 'assignedAreas' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(607,25): error TS2339: Property 'qualifications' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(611,31): error TS2339: Property 'qualifications' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(616,31): error TS2339: Property 'qualifications' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(618,36): error TS2339: Property 'qualifications' does not exist on type 'AnganwadiWorker'.
+app/components/WorkerManagement.tsx(627,50): error TS2339: Property 'joinDate' does not exist on type 'AnganwadiWorker'.
