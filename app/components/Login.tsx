@@ -10,7 +10,7 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const { t } = useApp();
-  const [selectedRole, setSelectedRole] = useState<'anganwadi_worker' | 'supervisor' | 'hospital' | 'admin'>('anganwadi_worker');
+  const [selectedRole, setSelectedRole] = useState<'anganwadi_worker' | 'hospital' | 'admin'>('anganwadi_worker');
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -123,24 +123,24 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         'Post-Hospitalization Tracking'
       ]
     },
-    supervisor: {
-      title: 'Department Supervisor Login',
-      subtitle: 'Block/District level officer overseeing Anganwadi operations',
-      icon: UserCheck,
-      color: 'bg-blue-600',
-      hoverColor: 'hover:bg-blue-700',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      textColor: 'text-blue-800',
-      features: [
-        'Dashboard Analytics & Trends',
-        'Center & Worker Management',
-        'Visit Ticketing System',
-        'Survey Management',
-        'Bed Coordination',
-        'Admission/Discharge Tracking'
-      ]
-    },
+    // supervisor: {
+    //   title: 'Department Supervisor Login',
+    //   subtitle: 'Block/District level officer overseeing Anganwadi operations',
+    //   icon: UserCheck,
+    //   color: 'bg-blue-600',
+    //   hoverColor: 'hover:bg-blue-700',
+    //   bgColor: 'bg-blue-50',
+    //   borderColor: 'border-blue-200',
+    //   textColor: 'text-blue-800',
+    //   features: [
+    //     'Dashboard Analytics & Trends',
+    //     'Center & Worker Management',
+    //     'Visit Ticketing System',
+    //     'Survey Management',
+    //     'Bed Coordination',
+    //     'Admission/Discharge Tracking'
+    //   ]
+    // },
     hospital: {
       title: 'Government Hospital Login',
       subtitle: 'NRC-equipped hospital for treatment & bed management',
@@ -188,12 +188,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 return (
                   <button
                     key={role}
-                    onClick={() => setSelectedRole(role as 'anganwadi_worker' | 'supervisor' | 'hospital' | 'admin')}
-                    className={`w-full p-4 rounded-lg border-2 transition-all ${
-                      selectedRole === role
-                        ? `${config.bgColor} ${config.borderColor} ${config.textColor}`
-                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                    }`}
+                    onClick={() => setSelectedRole(role as 'anganwadi_worker' | 'hospital' | 'admin')}
+                    className={`w-full p-4 rounded-lg border-2 transition-all ${selectedRole === role
+                      ? `${config.bgColor} ${config.borderColor} ${config.textColor}`
+                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                      }`}
                   >
                     <div className="flex items-start space-x-4">
                       <RoleIcon className="w-6 h-6 mt-1" />
@@ -238,7 +237,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 <input
                   type="text"
                   value={credentials.employeeId}
-                  onChange={(e) => setCredentials({...credentials, employeeId: e.target.value})}
+                  onChange={(e) => setCredentials({ ...credentials, employeeId: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your employee ID (if known)"
                 />
@@ -252,7 +251,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   type="text"
                   required
                   value={credentials.username}
-                  onChange={(e) => setCredentials({...credentials, username: e.target.value})}
+                  onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your username"
                 />
@@ -267,7 +266,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={credentials.password}
-                    onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                    onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                     className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="Enter your password"
                   />
@@ -316,11 +315,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <strong>Admin:</strong> ADMIN001 / admin / admin123
                   </div>
                 )}
-                {selectedRole === 'supervisor' && (
+                {/* {selectedRole === 'supervisor' && (
                   <div className="bg-white p-2 rounded border">
                     <strong>Supervisor:</strong> SUP001 / supervisor1 / worker123
                   </div>
-                )}
+                )} */}
                 {selectedRole === 'hospital' && (
                   <div className="bg-white p-2 rounded border">
                     <strong>Hospital:</strong> HOSP001 / hospital1 / worker123
